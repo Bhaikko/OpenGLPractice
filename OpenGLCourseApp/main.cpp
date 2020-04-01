@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string.h>
+#include <cmath>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -7,7 +8,12 @@
 const GLint WIDTH = 800;
 const GLint HEIGHT = 600;
 
-GLuint VAO, VBO, shader;    // IDs for VAO, VBO, shader stored as ints
+GLuint VAO, VBO, shader, uniformXMove;    // IDs for VAO, VBO, shader stored as ints
+
+bool direction = false;
+float triOffset = 0.0f;
+float triMaxOffset = 0.7f;
+float triIncrement = 0.05f;
 
 // Vertex Shader
 static const char* vShader = "                                  \n\
@@ -15,9 +21,11 @@ static const char* vShader = "                                  \n\
                                                                 \n\
 layout (location = 0) in vec3 pos;                              \n\
                                                                 \n\
+uniform float xMove;                                            \n\
+                                                                \n\
 void main()                                                     \n\
 {                                                               \n\
-    gl_Position = vec4(0.4 * pos.x, 0.4 * pos.y, pos.z, 1.0);   \n\
+    gl_Position = vec4(0.4 * pos.x + xMove, 0.4 * pos.y, pos.z, 1.0);   \n\
 }                                                               ";
 
 // Fragment Shader
@@ -93,6 +101,8 @@ void CompileShaders()
         std::cout << "Error Validating Program: " << eLog << std::endl;
         return;
     }
+
+    uniformXMove = glGetUniformLocation(shader, "xMove");   // Get id of uniform variable declared in vertex shader
 }
 
 void CreateTriangle()
@@ -131,7 +141,7 @@ int main()
         return 1;   // sends message to kernal that program crashed instead of running succesfully
     }
 
-    //  Setup GLFW Window properties
+    //  Setup GLFW Window properties.
     // OpenGL Version
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
@@ -177,11 +187,23 @@ int main()
         // Get and handle user input events
         glfwPollEvents();
 
+        if (direction) {
+            triOffset += triIncrement;
+        }
+        else {
+            triOffset -= triIncrement;
+        }
+
+        if (abs(triOffset) >= triMaxOffset) {
+            direction = !direction;
+        }
+
         // Clear Window
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);   // clears window and fresh start!!!
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shader);   // using 'shader' id as program to run
+        glUniform1f(uniformXMove, triOffset);   // Assigning value in vertex shader by using the uniform value ID
             glBindVertexArray(VAO);
                 glDrawArrays(GL_TRIANGLES, 0, 3);
             glBindVertexArray(0);
