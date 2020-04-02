@@ -5,15 +5,23 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+// GLM libraries
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 const GLint WIDTH = 800;
 const GLint HEIGHT = 600;
+const float toRadians = 3.14159265 / 180.0f;    // GLM library accepts radians so need to convert all degree angle
 
-GLuint VAO, VBO, shader, uniformXMove;    // IDs for VAO, VBO, shader stored as ints
+GLuint VAO, VBO, shader, uniformModel;    // IDs for VAO, VBO, shader stored as ints
 
 bool direction = false;
 float triOffset = 0.0f;
 float triMaxOffset = 0.7f;
 float triIncrement = 0.05f;
+
+float angleOffset = 0.0f;
 
 // Vertex Shader
 static const char* vShader = "                                  \n\
@@ -21,11 +29,11 @@ static const char* vShader = "                                  \n\
                                                                 \n\
 layout (location = 0) in vec3 pos;                              \n\
                                                                 \n\
-uniform float xMove;                                            \n\
+uniform mat4 model;                                            \n\
                                                                 \n\
 void main()                                                     \n\
 {                                                               \n\
-    gl_Position = vec4(0.4 * pos.x + xMove, 0.4 * pos.y, pos.z, 1.0);   \n\
+    gl_Position = model * vec4(pos, 1.0);   \n\
 }                                                               ";
 
 // Fragment Shader
@@ -102,7 +110,7 @@ void CompileShaders()
         return;
     }
 
-    uniformXMove = glGetUniformLocation(shader, "xMove");   // Get id of uniform variable declared in vertex shader
+    uniformModel = glGetUniformLocation(shader, "model");   // Get id of uniform variable declared in vertex shader
 }
 
 void CreateTriangle()
@@ -198,12 +206,31 @@ int main()
             direction = !direction;
         }
 
+        angleOffset += 1.0f;
+        if (angleOffset >= 360) {
+            angleOffset = 0;
+        }
+
+
         // Clear Window
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);   // clears window and fresh start!!!
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shader);   // using 'shader' id as program to run
-        glUniform1f(uniformXMove, triOffset);   // Assigning value in vertex shader by using the uniform value ID
+        glm::mat4 model(1.0f);    // Creating Identity Matrix
+        //model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f));   // Copying [triOffset, 0, 0] vector as translation in model
+        //model = glm::rotate(model, angleOffset * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+        model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
+        
+        /*for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                std::cout << model[i][j] << " ";
+            }
+            std::cout << std::endl;
+        }*/
+
+        //glUniform1f(uniformXMove, triOffset);   // Assigning value in vertex shader by using the uniform value ID
+        glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));   // value_ptr is used to get pointer of matrix as in glm, matrix isnt stored directly as pointer
             glBindVertexArray(VAO);
                 glDrawArrays(GL_TRIANGLES, 0, 3);
             glBindVertexArray(0);
