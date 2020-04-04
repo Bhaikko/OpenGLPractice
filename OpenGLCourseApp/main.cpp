@@ -14,7 +14,7 @@ const GLint WIDTH = 800;
 const GLint HEIGHT = 600;
 const float toRadians = 3.14159265 / 180.0f;    // GLM library accepts radians so need to convert all degree angle
 
-GLuint VAO, VBO, shader, uniformModel;    // IDs for VAO, VBO, shader stored as ints
+GLuint VAO, VBO, IBO, shader, uniformModel;    // IDs for VAO, VBO, IBO, shader stored as ints
 
 bool direction = false;
 float triOffset = 0.0f;
@@ -122,27 +122,44 @@ void CompileShaders()
 void CreateTriangle()
 {
     // Center of screen is (0, 0, 0)
+
+    // Adding references of vertices defined below through indexes
+    unsigned int indices[] = {
+        0, 3, 1,    // side triangle
+        1, 3, 2,     // Each number indicates index of triangle vertices in vertices array
+        2, 3, 0,
+        0, 1, 2
+    };
+
+
     // Triangle vertices in (x, y, z) order
     GLfloat vertices[] = {
         -1.0f, -1.0f, 0.0f,
+        0.0f, -1.0f, 1.0f,
         1.0f, -1.0f, 0.0f,
         0.0f, 1.0f, 0.0f
-    };
+    };  // These vertices will be stored in vertex index buffer and will be referenced to build geometry
 
     // Starting To Create Vertex Buffer from Points for Triangle
     glGenVertexArrays(1, &VAO); // This assigns ID to this VAO 
     glBindVertexArray(VAO); 
 
-        glGenBuffers(1, &VBO);  // This assign ID to this VBO
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        // Assigning ID to IBO
+        glGenBuffers(1, &IBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-            glEnableVertexAttribArray(0);
+            // The above code automatically binds VBO AND IBO
+            glGenBuffers(1, &VBO);  // This assign ID to this VBO
+            glBindBuffer(GL_ARRAY_BUFFER, VBO);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);   // Unbinding Buffer from previous buffer and Binding it to Nothing
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+                glEnableVertexAttribArray(0);
 
-    glBindVertexArray(0);   // Unbinding Current Vertex array to null
+            glBindBuffer(GL_ARRAY_BUFFER, 0);   // Unbinding Buffer from previous buffer and Binding it to Nothing
+        glBindVertexArray(0);   // Unbinding Current Vertex array to null
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); 
 
 }
 
@@ -190,6 +207,9 @@ int main()
         return 1;
     }
 
+    // Setting Up Depth-Buffer / Z-buffer
+    glEnable(GL_DEPTH_TEST);
+
     // Set viewport size
     glViewport(0, 0, bufferWidth, bufferHeight);    // This is OpenGL thing
 
@@ -220,13 +240,13 @@ int main()
 
         // Clear Window
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);   // clears window and fresh start!!!
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Combining frame and depth buffer
 
         glUseProgram(shader);   // using 'shader' id as program to run
         glm::mat4 model(1.0f);    // Creating Identity Matrix
         //model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f));   // Copying [triOffset, 0, 0] vector as translation in model
-        //model = glm::rotate(model, angleOffset * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
-        //model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
+        model = glm::rotate(model, angleOffset * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
         
         /*for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
@@ -238,7 +258,10 @@ int main()
         //glUniform1f(uniformXMove, triOffset);   // Assigning value in vertex shader by using the uniform value ID
         glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));   // value_ptr is used to get pointer of matrix as in glm, matrix isnt stored directly as pointer
             glBindVertexArray(VAO);
-                glDrawArrays(GL_TRIANGLES, 0, 3);
+                //glDrawArrays(GL_TRIANGLES, 0, 3); // This was done when Triangle vertices were directly used as for creating mesh
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+                    glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);   // This is done when Triangle vertices references are used through IBO as Indexes
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             glBindVertexArray(0);
         glUseProgram(0);    // Unassigning to null
 
