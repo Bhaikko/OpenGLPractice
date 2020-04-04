@@ -14,7 +14,7 @@ const GLint WIDTH = 800;
 const GLint HEIGHT = 600;
 const float toRadians = 3.14159265 / 180.0f;    // GLM library accepts radians so need to convert all degree angle
 
-GLuint VAO, VBO, IBO, shader, uniformModel;    // IDs for VAO, VBO, IBO, shader stored as ints
+GLuint VAO, VBO, IBO, shader, uniformModel, uniformProjection;    // IDs for VAO, VBO, IBO, shader stored as ints
 
 bool direction = false;
 float triOffset = 0.0f;
@@ -32,10 +32,11 @@ layout (location = 0) in vec3 pos;                              \n\
 out vec4 vCol;                                                  \n\
                                                                 \n\
 uniform mat4 model;                                             \n\
+uniform mat4 projection;                                        \n\
                                                                 \n\
 void main()                                                     \n\
 {                                                               \n\
-    gl_Position = model * vec4(pos, 1.0);                       \n\
+    gl_Position = projection * model * vec4(pos, 1.0);                       \n\
     vCol = vec4(clamp(pos, 0.0f, 1.0f), 1.0f);                  \n\
 }                                                               ";
 
@@ -117,6 +118,7 @@ void CompileShaders()
     }
 
     uniformModel = glGetUniformLocation(shader, "model");   // Get id of uniform variable declared in vertex shader
+    uniformProjection = glGetUniformLocation(shader, "projection");   // Get id of uniform variable declared in vertex shader
 }
 
 void CreateTriangle()
@@ -216,6 +218,8 @@ int main()
     CreateTriangle();
     CompileShaders();
 
+    glm::mat4 projection = glm::perspective(45.0f, (GLfloat)bufferWidth / (GLfloat)bufferHeight, 0.1f, 100.0f);
+
     // Loop until window closed
     while (!glfwWindowShouldClose(mainWindow)) {
         // Get and handle user input events
@@ -244,7 +248,7 @@ int main()
 
         glUseProgram(shader);   // using 'shader' id as program to run
         glm::mat4 model(1.0f);    // Creating Identity Matrix
-        //model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f));   // Copying [triOffset, 0, 0] vector as translation in model
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));   // Copying [triOffset, 0, 0] vector as translation in model
         model = glm::rotate(model, angleOffset * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
         model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
         
@@ -257,6 +261,7 @@ int main()
 
         //glUniform1f(uniformXMove, triOffset);   // Assigning value in vertex shader by using the uniform value ID
         glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));   // value_ptr is used to get pointer of matrix as in glm, matrix isnt stored directly as pointer
+        glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));   // value_ptr is used to get pointer of matrix as in glm, matrix isnt stored directly as pointer
             glBindVertexArray(VAO);
                 //glDrawArrays(GL_TRIANGLES, 0, 3); // This was done when Triangle vertices were directly used as for creating mesh
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
