@@ -24,5 +24,23 @@ private:
 	GLFWwindow* mainWindow;
 	GLint width, height;
 	GLint bufferWidth, bufferHeight;
+
+	bool keys[1024];	// Listen to key events to respective key pressed when set to true
+
+	GLfloat lastX;
+	GLfloat lastY;
+	GLfloat xChange;
+	GLfloat yChange;
+	bool mouseFirstMoved;
+
+private:
+	void createCallbacks();
+	static void handleKeys(GLFWwindow* window, int key, int code, int action, int mode);	// since callbacks cannot be local to objects hence they need to static and shared by referencing the class
+	static void handleMouse(GLFWwindow* window, double xPos, double yPos);
+
+public:
+	bool* getKeys() { return keys; }
+	GLfloat getXChange();
+	GLfloat getYChange();
 };
 
