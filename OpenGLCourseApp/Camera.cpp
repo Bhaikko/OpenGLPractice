@@ -30,24 +30,48 @@ void Camera::update()
 
 }
 
-void Camera::KeyControl(bool* keys)
+void Camera::KeyControl(bool* keys, GLfloat deltaTime)
 {
+	GLfloat velocity = movementSpeed * deltaTime;
+
 	// Movement Controls
 	if (keys[GLFW_KEY_W]) {
-		position += front * movementSpeed;
+		//position += front * movementSpeed;	// This is FPS dependent
+		position += front * velocity;	// This is FPS independent
 	}
 	
 	if (keys[GLFW_KEY_S]) {
-		position -= front * movementSpeed;
+		position -= front * velocity;
 	}
 	
 	if (keys[GLFW_KEY_A]) {
-		position -= right * movementSpeed;
+		position -= right * velocity;
 	}
 	
 	if (keys[GLFW_KEY_D]) {
-		position += right * movementSpeed;
+		position += right * velocity;
 	}
+}
+
+void Camera::MouseControl(GLfloat xChange, GLfloat yChange)
+{
+	// Mouse Camera Control
+	xChange *= turnSpeed;
+	yChange *= turnSpeed;
+
+	yaw += xChange;
+	pitch += yChange;
+
+	// Clamping Pitch and Yaw
+	if (pitch > 89.0f) {
+		pitch = 89.0f;
+	} 
+
+	if (pitch < -89.0f) {
+		pitch = -89.0f;
+	}
+
+	update();
 }
 
 glm::mat4 Camera::CalculateViewMatrix()

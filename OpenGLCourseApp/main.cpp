@@ -21,6 +21,10 @@ std::vector<Mesh*> meshList;
 std::vector<Shader> shaderList;
 Camera camera;
 
+// Delta Time Setup
+GLfloat deltaTime = 0.0f;
+GLfloat lastTime = 0.0f;
+
  //Vertex Shader Path
 static const char* vShader = "Shaders/shader.vert";
 
@@ -70,7 +74,7 @@ int main()
     
     CreateObjects();
     CreateShaders();
-    camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 90.0f, 0.0f, 5.0f, 1.0f);
+    camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 1.0f, 1.0f);
 
     GLuint uniformModel, uniformProjection, uniformView;
     glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / (GLfloat)mainWindow.getBufferHeight(), 0.1f, 100.0f);
@@ -79,10 +83,15 @@ int main()
 
     // Loop until window closed
     while (!mainWindow.GetShouldClose()) {
+        GLfloat now = glfwGetTime();
+        deltaTime = now - lastTime;
+        lastTime = now;
+
         // Get and handle user input events
         glfwPollEvents();
 
-        camera.KeyControl(mainWindow.getKeys());    // Passing reference of keys to Camera
+        camera.KeyControl(mainWindow.getKeys(), deltaTime);    // Passing reference of keys to Camera
+        camera.MouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 
         // Clear Window
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);   // clears window and fresh start!!!
