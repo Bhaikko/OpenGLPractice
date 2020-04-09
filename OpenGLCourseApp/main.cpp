@@ -12,12 +12,14 @@
 #include "Window.h"
 #include "Mesh.h"
 #include "Shader.h"
+#include "Camera.h"
 
 const float toRadians = 3.14159265 / 180.0f;    // GLM library accepts radians so need to convert all degree angle
 
 Window mainWindow;
 std::vector<Mesh*> meshList;
 std::vector<Shader> shaderList;
+Camera camera;
 
  //Vertex Shader Path
 static const char* vShader = "Shaders/shader.vert";
@@ -68,8 +70,9 @@ int main()
     
     CreateObjects();
     CreateShaders();
+    camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 90.0f, 0.0f, 5.0f, 1.0f);
 
-    GLuint uniformModel, uniformProjection;
+    GLuint uniformModel, uniformProjection, uniformView;
     glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / (GLfloat)mainWindow.getBufferHeight(), 0.1f, 100.0f);
 
     bool a = false;
@@ -77,6 +80,9 @@ int main()
     // Loop until window closed
     while (!mainWindow.GetShouldClose()) {
         // Get and handle user input events
+        glfwPollEvents();
+
+        camera.KeyControl(mainWindow.getKeys());    // Passing reference of keys to Camera
 
         // Clear Window
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);   // clears window and fresh start!!!
@@ -85,6 +91,7 @@ int main()
         shaderList[0].UseShader();   // using 'shader' id as program to run
         uniformModel = shaderList[0].GetModelLocation();
         uniformProjection = shaderList[0].GetProjectionLocation();
+        uniformView = shaderList[0].GetViewLocation();
 
         glm::mat4 model(1.0f);    // Creating Identity Matrix
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));   // Copying [triOffset, 0, 0] vector as translation in model
@@ -94,6 +101,7 @@ int main()
         //glUniform1f(uniformXMove, triOffset);   // Assigning value in vertex shader by using the uniform value ID
         glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));   // value_ptr is used to get pointer of matrix as in glm, matrix isnt stored directly as pointer
         glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));   // value_ptr is used to get pointer of matrix as in glm, matrix isnt stored directly as pointer
+        glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.CalculateViewMatrix()));   // value_ptr is used to get pointer of matrix as in glm, matrix isnt stored directly as pointer
         meshList[1]->RenderMesh();
 
         glUseProgram(0);    // Unassigning to null
