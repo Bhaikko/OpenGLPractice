@@ -1,3 +1,5 @@
+#define STB_IMAGE_IMPLEMENTATION    // Decleration for stb_image.h
+
 #include <iostream>
 #include <vector>
 
