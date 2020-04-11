@@ -26,8 +26,11 @@ void Mesh::CreateMesh(GLfloat* vertices, unsigned int* indices, unsigned int num
             glBindBuffer(GL_ARRAY_BUFFER, VBO);
             glBufferData(GL_ARRAY_BUFFER, numOfVertices * sizeof(vertices[0]), vertices, GL_STATIC_DRAW);
 
-                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 5, 0);    // Jump Offset as next vertex X position start after 5 float values in vertices array
                 glEnableVertexAttribArray(0);
+                // Setting Up UV coordinates
+                glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 5, (void*)(sizeof(vertices[0]) * 3)); // index = 1 refers to layout defined in vertex shader
+                glEnableVertexAttribArray(1);
 
             glBindBuffer(GL_ARRAY_BUFFER, 0);   // Unbinding Buffer from previous buffer and Binding it to Nothing
         glBindVertexArray(0);   // Unbinding Current Vertex array to null

@@ -15,6 +15,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Camera.h"
+#include "Texture.h"
 
 const float toRadians = 3.14159265 / 180.0f;    // GLM library accepts radians so need to convert all degree angle
 
@@ -22,6 +23,9 @@ Window mainWindow;
 std::vector<Mesh*> meshList;
 std::vector<Shader> shaderList;
 Camera camera;
+
+Texture brickTexture;
+Texture dirtTexture;
 
 // Delta Time Setup
 GLfloat deltaTime = 0.0f;
@@ -46,20 +50,20 @@ void CreateObjects()
     };
 
 
-    // Triangle vertices in (x, y, z) order
+    // Triangle vertices in (x, y, z, u, v) order
     GLfloat vertices[] = {
-        -1.0f, -1.0f, 0.0f,
-        0.0f, -1.0f, 1.0f,
-        1.0f, -1.0f, 0.0f,
-        0.0f, 1.0f, 0.0f
+        -1.0f,  -1.0f,  0.0f,   0.0f,   0.0f, 
+        0.0f,   -1.0f,  1.0f,   0.5f,   0.0f,
+        1.0f,   -1.0f,  0.0f,   1.0f,   0.0f,
+        0.0f,   1.0f,   0.0f,   0.5f,   1.0f
     };  // These vertices will be stored in vertex index buffer and will be referenced to build geometry
 
     Mesh* obj1 = new Mesh();
-    obj1->CreateMesh(vertices, indices, 12, 12);
+    obj1->CreateMesh(vertices, indices, 20, 12);
     meshList.push_back(obj1);
 
     Mesh* obj2 = new Mesh();
-    obj2->CreateMesh(vertices, indices, 12, 12);
+    obj2->CreateMesh(vertices, indices, 20, 12);
     meshList.push_back(obj2);
 }
 
@@ -78,10 +82,16 @@ int main()
     CreateShaders();
     camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 1.0f, 1.0f);
 
+    char texturePath[25] = "Textures/brick2.png";
+    brickTexture = Texture(texturePath);
+    brickTexture.LoadTexture(); // To load texture into GPU
+
+    strcpy_s(texturePath, "Textures/dirt.png");
+    dirtTexture = Texture(texturePath);
+    dirtTexture.LoadTexture();
+
     GLuint uniformModel, uniformProjection, uniformView;
     glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / (GLfloat)mainWindow.getBufferHeight(), 0.1f, 100.0f);
-
-    bool a = false;
 
     // Loop until window closed
     while (!mainWindow.GetShouldClose()) {
@@ -105,14 +115,23 @@ int main()
         uniformView = shaderList[0].GetViewLocation();
 
         glm::mat4 model(1.0f);    // Creating Identity Matrix
+
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));   // Copying [triOffset, 0, 0] vector as translation in model
         //model = glm::rotate(model, angleOffset * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
         model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
         
         //glUniform1f(uniformXMove, triOffset);   // Assigning value in vertex shader by using the uniform value ID
         glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));   // value_ptr is used to get pointer of matrix as in glm, matrix isnt stored directly as pointer
-        glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));   // value_ptr is used to get pointer of matrix as in glm, matrix isnt stored directly as pointer
-        glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.CalculateViewMatrix()));   // value_ptr is used to get pointer of matrix as in glm, matrix isnt stored directly as pointer
+        glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));   
+        glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.CalculateViewMatrix()));  
+        brickTexture.UseTexture();  // Use the loaded texture
+        meshList[0]->RenderMesh();
+        
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 1.0f, -2.5f));
+        model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
+        glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));  
+        dirtTexture.UseTexture();
         meshList[1]->RenderMesh();
 
         glUseProgram(0);    // Unassigning to null

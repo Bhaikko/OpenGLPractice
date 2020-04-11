@@ -2,7 +2,7 @@
                                 
 #version 330                                                    
                                                                 
-layout (location = 0) in vec3 pos;                              
+layout (location = 0) in vec3 pos;          // In glVertexAttribPointer, first argument, index referes to this location                    
                                                                 
 out vec4 vCol;                                                  
                                                                 
