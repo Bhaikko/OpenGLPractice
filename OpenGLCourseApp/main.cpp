@@ -16,6 +16,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Texture.h"
+#include "Light.h"
 
 const float toRadians = 3.14159265 / 180.0f;    // GLM library accepts radians so need to convert all degree angle
 
@@ -26,6 +27,7 @@ Camera camera;
 
 Texture brickTexture;
 Texture dirtTexture;
+Light mainLight;
 
 // Delta Time Setup
 GLfloat deltaTime = 0.0f;
@@ -90,7 +92,9 @@ int main()
     dirtTexture = Texture(texturePath);
     dirtTexture.LoadTexture();
 
-    GLuint uniformModel, uniformProjection, uniformView;
+    mainLight = Light(1.0f, 0.0f, 0.0f, 0.3f);
+
+    GLuint uniformModel, uniformProjection, uniformView, uniformAmbientIntensity, uniformAmbientColor;
     glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / (GLfloat)mainWindow.getBufferHeight(), 0.1f, 100.0f);
 
     // Loop until window closed
@@ -113,6 +117,10 @@ int main()
         uniformModel = shaderList[0].GetModelLocation();
         uniformProjection = shaderList[0].GetProjectionLocation();
         uniformView = shaderList[0].GetViewLocation();
+        uniformAmbientColor = shaderList[0].GetAmbientColorLocation();
+        uniformAmbientIntensity = shaderList[0].GetAmbientIntensityLocation();
+
+        mainLight.UseLight(uniformAmbientIntensity, uniformAmbientColor);
 
         glm::mat4 model(1.0f);    // Creating Identity Matrix
 

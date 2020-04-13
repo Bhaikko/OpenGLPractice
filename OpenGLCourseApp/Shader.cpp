@@ -107,7 +107,9 @@ void Shader::CompileShaders(const char* vShaderCode, const char* fShaderCode)
 		return;
 	}
 
-	uniformModel = glGetUniformLocation(shader, "model");   // Get id of uniform variable declared in vertex shader
-	uniformProjection = glGetUniformLocation(shader, "projection");   // Get id of uniform variable declared in vertex shader
-	uniformView = glGetUniformLocation(shader, "view");   // Get id of uniform variable declared in vertex shader
+	uniformModel = glGetUniformLocation(shader, "model");   // Get id of uniform variable declared in vertex shader using current vertex shader id
+	uniformProjection = glGetUniformLocation(shader, "projection");   
+	uniformView = glGetUniformLocation(shader, "view");   
+	uniformAmbientColor = glGetUniformLocation(shader, "directionalLight.color");
+	uniformAmbientIntensity = glGetUniformLocation(shader, "directionalLight.ambientIntensity");
 }
