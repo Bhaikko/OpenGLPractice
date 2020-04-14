@@ -92,7 +92,7 @@ int main()
     dirtTexture = Texture(texturePath);
     dirtTexture.LoadTexture();
 
-    mainLight = Light(1.0f, 0.0f, 0.0f, 0.3f);
+    mainLight = Light(1.0f, 1.0f, 1.0f, 0.7f);
 
     GLuint uniformModel, uniformProjection, uniformView, uniformAmbientIntensity, uniformAmbientColor;
     glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / (GLfloat)mainWindow.getBufferHeight(), 0.1f, 100.0f);

@@ -4,9 +4,11 @@
                                                                 
 layout (location = 0) in vec3 pos;          // In glVertexAttribPointer, first argument, index referes to this location                    
 layout (location = 1) in vec2 tex;
+layout (location = 2) in vec3 norm;         // Normal of current vertex after being averaged out by surfaces
 
 out vec4 vCol;                     
-out vec2 TexCoord;                             
+out vec2 TexCoord;                 
+out vec3 Normal;            
                                                                 
 uniform mat4 model;                                             
 uniform mat4 projection;   
@@ -18,5 +20,8 @@ void main()
     // gl_Position = vec4(pos, 1.0);           
     vCol = vec4(clamp(pos, 0.0f, 1.0f), 1.0f);    
 
-    TexCoord = tex;              
+    TexCoord = tex;
+
+    // To transform normals of vertex when the same vertex is rotated or scaled.
+    Normal = mat3(transpose(inverse(model))) * norm;   
 }                                                               
