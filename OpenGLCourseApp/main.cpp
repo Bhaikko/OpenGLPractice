@@ -127,9 +127,13 @@ int main()
     dirtTexture = Texture(texturePath);
     dirtTexture.LoadTexture();
 
-    mainLight = Light(1.0f, 1.0f, 1.0f, 0.7f);
+    // Directional Light
+    mainLight = Light(
+        1.0f, 1.0f, 1.0f, 0.2f, // Ambient Light CFG
+        2.0f, -1.0f, -2.0f, 1.0f    // Diffuse Light CFG
+    );
 
-    GLuint uniformModel, uniformProjection, uniformView, uniformAmbientIntensity, uniformAmbientColor;
+    GLuint uniformModel, uniformProjection, uniformView, uniformAmbientIntensity, uniformAmbientColor, uniformDirection, uniformDiffuseIntensity;
     glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / (GLfloat)mainWindow.getBufferHeight(), 0.1f, 100.0f);
 
     // Loop until window closed
@@ -154,8 +158,10 @@ int main()
         uniformView = shaderList[0].GetViewLocation();
         uniformAmbientColor = shaderList[0].GetAmbientColorLocation();
         uniformAmbientIntensity = shaderList[0].GetAmbientIntensityLocation();
+        uniformDirection = shaderList[0].GetDirectionLocation();
+        uniformDiffuseIntensity = shaderList[0].GetDiffuseIntensityLocation();
 
-        mainLight.UseLight(uniformAmbientIntensity, uniformAmbientColor);
+        mainLight.UseLight(uniformAmbientIntensity, uniformAmbientColor, uniformDiffuseIntensity, uniformDirection);
 
         glm::mat4 model(1.0f);    // Creating Identity Matrix
 
