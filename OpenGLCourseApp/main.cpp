@@ -94,11 +94,11 @@ void CreateObjects()
     calcAverageNormals(indices, 12, vertices, 32, 8, 5);
 
     Mesh* obj1 = new Mesh();
-    obj1->CreateMesh(vertices, indices, 20, 12);
+    obj1->CreateMesh(vertices, indices, 32, 12);
     meshList.push_back(obj1);
 
     Mesh* obj2 = new Mesh();
-    obj2->CreateMesh(vertices, indices, 20, 12);
+    obj2->CreateMesh(vertices, indices, 32, 12);
     meshList.push_back(obj2);
 }
 

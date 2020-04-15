@@ -33,7 +33,7 @@ void Mesh::CreateMesh(GLfloat* vertices, unsigned int* indices, unsigned int num
                 glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 8, (void*)(sizeof(vertices[0]) * 3)); // index = 1 refers to layout (UV) defined in vertex shader
                 glEnableVertexAttribArray(1);
                 // Setting Up Normal Coodinates
-                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 8, (void*)(sizeof(vertices[0]) * 5));  // index = 2 refers to layout (Normal) defined in vertex shader
+                glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 8, (void*)(sizeof(vertices[0]) * 5));  // index = 2 refers to layout (Normal) defined in vertex shader
                 glEnableVertexAttribArray(2);
 
             glBindBuffer(GL_ARRAY_BUFFER, 0);   // Unbinding Buffer from previous buffer and Binding it to Nothing
