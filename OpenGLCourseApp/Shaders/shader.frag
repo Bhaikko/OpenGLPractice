@@ -20,7 +20,7 @@ struct DirectionalLight {
 struct Material {
     float specularIntensity;
     float shininess;
-}
+};
                                                                 
 uniform sampler2D theTexture;   // This uses active texture set in Texture::UseTexture() 
 uniform DirectionalLight directionalLight;
@@ -47,9 +47,9 @@ void main()
         vec3 reflectedVertex = normalize(reflect(directionalLight.direction, normalize(Normal)));
 
         float specularFactor = dot(fragToEye, reflectedVertex);
-        if (specularColor > 0.0f) {
+        if (specularFactor > 0.0f) {
             specularFactor = pow(specularFactor, material.shininess);
-            specularColor = vec4(directionalLight.color * material.specularIntensity * specularFactor);
+            specularColor = vec4(directionalLight.color * material.specularIntensity * specularFactor, 1.0f);
         }
     }    
 
