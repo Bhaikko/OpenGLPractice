@@ -79,6 +79,11 @@ glm::mat4 Camera::CalculateViewMatrix()
 	return glm::lookAt(position, position + front, up);	// Returns a View matrix 
 }
 
+glm::vec3 Camera::GetCameraPosition()
+{
+	return position;
+}
+
 Camera::~Camera()
 {
 
