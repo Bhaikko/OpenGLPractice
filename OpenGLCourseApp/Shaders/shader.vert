@@ -8,7 +8,8 @@ layout (location = 2) in vec3 norm;         // Normal of current vertex after be
 
 out vec4 vCol;                     
 out vec2 TexCoord;                 
-out vec3 Normal;            
+out vec3 Normal; 
+out vec3 FragPos;           
                                                                 
 uniform mat4 model;                                             
 uniform mat4 projection;   
@@ -24,4 +25,7 @@ void main()
 
     // To transform normals of vertex when the same vertex is rotated or scaled.
     Normal = mat3(transpose(inverse(model))) * norm;   
+
+    // swizzling to get vec3 from vec4
+    FragPos = (model * vec4(pos, 1.0)).xyz;
 }                                                               
