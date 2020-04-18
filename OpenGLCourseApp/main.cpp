@@ -16,7 +16,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Texture.h"
-#include "Light.h"
+#include "DirectionalLight.h"
 #include "Material.h"
 
 const float toRadians = 3.14159265 / 180.0f;    // GLM library accepts radians so need to convert all degree angle
@@ -32,7 +32,7 @@ Texture dirtTexture;
 Material shinyMaterial;
 Material dullMaterial;
 
-Light mainLight;
+DirectionalLight mainLight;
 
 // Delta Time Setup
 GLfloat deltaTime = 0.0f;
@@ -134,9 +134,11 @@ int main()
     dirtTexture.LoadTexture();
 
     // Directional Light
-    mainLight = Light(
-        1.0f, 1.0f, 1.0f, 0.1f, // Ambient Light CFG
-        2.0f, -1.0f, -2.0f, 0.1f    // Diffuse Light CFG
+    mainLight = DirectionalLight(
+        1.0f, 1.0f, 1.0f, 
+        0.1f,   // Ambient Light CFG
+        0.3f,   // Diffuse Light CFG
+        0.0f, 0.0f, -1.0f
     );
 
     shinyMaterial = Material(1.0f, 32.0f);
