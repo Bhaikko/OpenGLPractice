@@ -2,7 +2,10 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <string>
 #include <GL/glew.h>
+
+#include "CommonValues.h"
 
 #include "DirectionalLight.h"
 #include "PointLight.h"
@@ -40,7 +43,10 @@ public:
 private:
 	int pointLightCount;
 
-	// Storing light IDs in struct
+	// To bind the above Point light count to shader point light count
+	GLuint uniformPointLightCount;
+
+	// Storing directional light IDs in struct
 	struct {
 		GLuint uniformColor;
 		GLuint uniformAmbientIntensity;
@@ -48,8 +54,22 @@ private:
 
 		GLuint uniformDirection;
 	} uniformDirectionalLight;
+	
+
+	// Storing Point light IDs in struct for multiple point lights
+	struct {
+		GLuint uniformColor;
+		GLuint uniformAmbientIntensity;
+		GLuint uniformDiffuseIntensity;
+
+		GLuint uniformPosition;
+		GLuint uniformConstant;
+		GLuint uniformLinear;
+		GLuint uniformExponent;
+	} uniformPointLight[MAX_POINT_LIGHTS];
 
 public:
 	void SetDirectionalLight(DirectionalLight* dLight);
+	void SetPointLights(PointLight* pLights, unsigned int lightCount);
 };
 
