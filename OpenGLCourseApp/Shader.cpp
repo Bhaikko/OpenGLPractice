@@ -110,11 +110,20 @@ void Shader::CompileShaders(const char* vShaderCode, const char* fShaderCode)
 	uniformModel = glGetUniformLocation(shader, "model");   // Get id of uniform variable declared in vertex shader using current vertex shader id
 	uniformProjection = glGetUniformLocation(shader, "projection");   
 	uniformView = glGetUniformLocation(shader, "view");   
-	uniformAmbientColor = glGetUniformLocation(shader, "directionalLight.color");
-	uniformAmbientIntensity = glGetUniformLocation(shader, "directionalLight.ambientIntensity");
-	uniformDirection = glGetUniformLocation(shader, "directionalLight.direction");
-	uniformDiffuseIntensity = glGetUniformLocation(shader, "directionalLight.diffuseIntensity");
+	uniformDirectionalLight.uniformColor = glGetUniformLocation(shader, "directionalLight.color");
+	uniformDirectionalLight.uniformAmbientIntensity = glGetUniformLocation(shader, "directionalLight.ambientIntensity");
+	uniformDirectionalLight.uniformDirection = glGetUniformLocation(shader, "directionalLight.direction");
+	uniformDirectionalLight.uniformDiffuseIntensity = glGetUniformLocation(shader, "directionalLight.diffuseIntensity");
 	uniformSpecularIntensity = glGetUniformLocation(shader, "material.specularIntensity");
 	uniformShininess = glGetUniformLocation(shader, "material.shininess");
 	uniformEyePosition = glGetUniformLocation(shader, "eyePosition");
+}
+
+void Shader::SetDirectionalLight(DirectionalLight* dLight)
+{
+	// ID location of Directional Light are passed here and handled by shader and no longer in main()
+	dLight->UseLight(
+		uniformDirectionalLight.uniformAmbientIntensity, uniformDirectionalLight.uniformColor, uniformDirectionalLight.uniformDiffuseIntensity, 
+		uniformDirectionalLight.uniformDirection
+	);
 }

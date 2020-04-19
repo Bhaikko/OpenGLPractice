@@ -145,7 +145,6 @@ int main()
     dullMaterial = Material(0.3f, 4.0f);
 
     GLuint uniformModel, uniformProjection, uniformView, uniformEyePosition,
-        uniformAmbientIntensity, uniformAmbientColor, uniformDirection, uniformDiffuseIntensity,
         uniformSpecularIntensity, uniformShininess;
     glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / (GLfloat)mainWindow.getBufferHeight(), 0.1f, 100.0f);
 
@@ -169,16 +168,21 @@ int main()
         uniformModel = shaderList[0].GetModelLocation();
         uniformProjection = shaderList[0].GetProjectionLocation();
         uniformView = shaderList[0].GetViewLocation();
-        uniformAmbientColor = shaderList[0].GetAmbientColorLocation();
-        uniformAmbientIntensity = shaderList[0].GetAmbientIntensityLocation();
-        uniformDirection = shaderList[0].GetDirectionLocation();
-        uniformDiffuseIntensity = shaderList[0].GetDiffuseIntensityLocation();
+
+        // Since Directional Light IDs are handled by Shader itself, Hence the below IDs are useless
+        /*
+            uniformAmbientColor = shaderList[0].GetAmbientColorLocation();
+            uniformAmbientIntensity = shaderList[0].GetAmbientIntensityLocation();
+            uniformDirection = shaderList[0].GetDirectionLocation();
+            uniformDiffuseIntensity = shaderList[0].GetDiffuseIntensityLocation();
+        */
+
         uniformEyePosition = shaderList[0].GetEyePositionLocation();
         uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
         uniformShininess = shaderList[0].GetShininessLocation();
 
-
-        mainLight.UseLight(uniformAmbientIntensity, uniformAmbientColor, uniformDiffuseIntensity, uniformDirection);
+        //mainLight.UseLight(uniformAmbientIntensity, uniformAmbientColor, uniformDiffuseIntensity, uniformDirection);
+        shaderList[0].SetDirectionalLight(&mainLight);
 
         glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
         glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.CalculateViewMatrix()));
