@@ -8,35 +8,53 @@ in vec2 TexCoord;
 in vec3 Normal;
 in vec3 FragPos;
 
+const int MAX_POINT_LIGHTS = 3;
+
 out vec4 color;
 
-struct DirectionalLight {
+struct Light {
     vec3 color;
     float ambientIntensity;
-    vec3 direction;
     float diffuseIntensity;
+};
+
+struct DirectionalLight {
+    Light base;
+    vec3 direction;
+};
+
+struct PointLight {
+    Light base;
+    vec3 position;
+    float constant;
+    float linear;
+    float exponent;
 };
 
 struct Material {
     float specularIntensity;
     float shininess;
 };
+
+uniform int pointLightCount;
                                                                 
-uniform sampler2D theTexture;   // This uses active texture set in Texture::UseTexture() 
 uniform DirectionalLight directionalLight;
+uniform PointLight pointLights[MAX_POINT_LIGHTS];
+
+uniform sampler2D theTexture;   // This uses active texture set in Texture::UseTexture() 
 uniform Material material;
 
 uniform vec3 eyePosition;   // Camera Position
 
-void main()                                                     
-{                                                               
-    // color = vec4(1.0, 0.0, 0.0, 1.0);                        
-    // color = vCol;     
-    // color = texture(theTexture, TexCoord) * vCol;      // TO multiple color and texure            
-    vec4 ambientColor = vec4(directionalLight.color, 1.0f) * directionalLight.ambientIntensity;
+// Since Light based on direction is mandatory to be calculated for both 
+// Directional Light and Point
+// Only difference is, Point light attenuates
+vec4 CalcLightByDirection(Light light, vec3 direction)
+{
+    vec4 ambientColor = vec4(light.color, 1.0f) * light.ambientIntensity;
 
-    float diffuseFactor = max(dot(normalize(Normal), normalize(directionalLight.direction)), 0.0f);
-    vec4 diffuseColor = vec4(directionalLight.color, 1.0f) * directionalLight.diffuseIntensity * diffuseFactor;
+    float diffuseFactor = max(dot(normalize(Normal), normalize(direction)), 0.0f);
+    vec4 diffuseColor = vec4(light.color, 1.0f) * light.diffuseIntensity * diffuseFactor;
 
     vec4 specularColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -44,16 +62,37 @@ void main()
         // Only to add specular light if there is diffuse light on Mesh
 
         vec3 fragToEye = normalize(eyePosition - FragPos);
-        vec3 reflectedVertex = normalize(reflect(directionalLight.direction, normalize(Normal)));
+        vec3 reflectedVertex = normalize(reflect(direction, normalize(Normal)));
 
         float specularFactor = dot(fragToEye, reflectedVertex);
         if (specularFactor > 0.0f) {
             specularFactor = pow(specularFactor, material.shininess);
-            specularColor = vec4(directionalLight.color * material.specularIntensity * specularFactor, 1.0f);
+            specularColor = vec4(light.color * material.specularIntensity * specularFactor, 1.0f);
         }
-    }    
+    } 
 
-    color = texture(theTexture, TexCoord) * (ambientColor + diffuseColor + specularColor); 
+    return ambientColor + diffuseColor + specularColor;
+}
+
+vec4 CalcDirectionalLight()
+{
+    return CalcLightByDirection(directionalLight.base, directionalLight.direction);
+}
+
+vec4 CalcPointLights()
+{
+
+}
+
+void main()                                                     
+{                                                               
+    // color = vec4(1.0, 0.0, 0.0, 1.0);                        
+    // color = vCol;     
+    // color = texture(theTexture, TexCoord) * vCol;      // TO multiple color and texure            
+    vec4 finalColor = CalcDirectionalLight();
+    // finalColor += CalcPointLights;
+
+    color = texture(theTexture, TexCoord) * finalColor; 
 }                                                               
 
 // Color Multiplication
