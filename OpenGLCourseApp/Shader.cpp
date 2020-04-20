@@ -120,30 +120,32 @@ void Shader::CompileShaders(const char* vShaderCode, const char* fShaderCode)
 	uniformDirectionalLight.uniformDiffuseIntensity = glGetUniformLocation(shader, "directionalLight.base.diffuseIntensity");
 	uniformDirectionalLight.uniformDirection = glGetUniformLocation(shader, "directionalLight.direction");
 
+	uniformPointLightCount = glGetUniformLocation(shader, "pointLightCount");
+
 	// Uniform values of Point Lights
 	for (size_t i = 0; i < MAX_POINT_LIGHTS; i++)
 	{
 		std::string uniformLocationString = "";
 
-		uniformLocationString = "pointLights[" + std::to_string(i) += "].base.color";
+		uniformLocationString = "pointLights[" + std::to_string(i) + "].base.color";
 		uniformPointLight[i].uniformColor = glGetUniformLocation(shader, uniformLocationString.c_str());
 
-		uniformLocationString = "pointLights[" + std::to_string(i) += "].base.ambientIntensity";
+		uniformLocationString = "pointLights[" + std::to_string(i) + "].base.ambientIntensity";
 		uniformPointLight[i].uniformAmbientIntensity = glGetUniformLocation(shader, uniformLocationString.c_str());
 
-		uniformLocationString = "pointLights[" + std::to_string(i) += "].base.diffuseIntensity";
+		uniformLocationString = "pointLights[" + std::to_string(i) + "].base.diffuseIntensity";
 		uniformPointLight[i].uniformDiffuseIntensity = glGetUniformLocation(shader, uniformLocationString.c_str());
 
-		uniformLocationString = "pointLights[" + std::to_string(i) += "].position";
+		uniformLocationString = "pointLights[" + std::to_string(i) + "].position";
 		uniformPointLight[i].uniformPosition = glGetUniformLocation(shader, uniformLocationString.c_str());
 
-		uniformLocationString = "pointLights[" + std::to_string(i) += "].constant";
+		uniformLocationString = "pointLights[" + std::to_string(i) + "].constant";
 		uniformPointLight[i].uniformConstant = glGetUniformLocation(shader, uniformLocationString.c_str());
 
-		uniformLocationString = "pointLights[" + std::to_string(i) += "].linear";
+		uniformLocationString = "pointLights[" + std::to_string(i) + "].linear";
 		uniformPointLight[i].uniformLinear = glGetUniformLocation(shader, uniformLocationString.c_str());
 
-		uniformLocationString = "pointLights[" + std::to_string(i) += "].exponent";
+		uniformLocationString = "pointLights[" + std::to_string(i) + "].exponent";
 		uniformPointLight[i].uniformExponent = glGetUniformLocation(shader, uniformLocationString.c_str());
 	}
 

@@ -11,12 +11,15 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "CommonValues.h"
+
 #include "Window.h"
 #include "Mesh.h"
 #include "Shader.h"
 #include "Camera.h"
 #include "Texture.h"
 #include "DirectionalLight.h"
+#include "PointLight.h"
 #include "Material.h"
 
 const float toRadians = 3.14159265 / 180.0f;    // GLM library accepts radians so need to convert all degree angle
@@ -33,6 +36,7 @@ Material shinyMaterial;
 Material dullMaterial;
 
 DirectionalLight mainLight;
+PointLight pointLights[MAX_POINT_LIGHTS];
 
 // Delta Time Setup
 GLfloat deltaTime = 0.0f;
@@ -71,7 +75,6 @@ void calcAverageNormals(unsigned int* indices, unsigned int indiceCount, GLfloat
         vec = glm::normalize(vec);
 
         vertices[nOffset] = vec.x; vertices[nOffset + 1] = vec.y; vertices[nOffset + 2] = vec.z;
-
     }
 }
 
@@ -141,6 +144,15 @@ int main()
         0.0f, 0.0f, -1.0f
     );
 
+    unsigned int pointLightCount = 0;
+    pointLights[0] = PointLight(
+        0.0f, 1.0f, 0.0f,
+        0.1f, 1.0f,
+        -4.0f, 0.0f, 0.0f,
+        0.3f, 0.2f, 0.1f
+    );
+    pointLightCount++;
+
     shinyMaterial = Material(1.0f, 32.0f);
     dullMaterial = Material(0.3f, 4.0f);
 
@@ -183,6 +195,7 @@ int main()
 
         //mainLight.UseLight(uniformAmbientIntensity, uniformAmbientColor, uniformDiffuseIntensity, uniformDirection);
         shaderList[0].SetDirectionalLight(&mainLight);
+        shaderList[0].SetPointLights(pointLights, pointLightCount);
 
         glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
         glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.CalculateViewMatrix()));
