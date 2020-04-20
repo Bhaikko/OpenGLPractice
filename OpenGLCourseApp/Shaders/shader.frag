@@ -90,7 +90,7 @@ void main()
     // color = vCol;     
     // color = texture(theTexture, TexCoord) * vCol;      // TO multiple color and texure            
     vec4 finalColor = CalcDirectionalLight();
-    // finalColor += CalcPointLights;
+    finalColor += CalcPointLights;
 
     color = texture(theTexture, TexCoord) * finalColor; 
 }                                                               
