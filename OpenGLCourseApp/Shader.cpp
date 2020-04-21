@@ -182,4 +182,3 @@ void Shader::SetPointLights(PointLight* pLights, unsigned int lightCount)
 	}
 }
 
-// Continue from 46:06, changing fragment shader

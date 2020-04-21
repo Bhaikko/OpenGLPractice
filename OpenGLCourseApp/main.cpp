@@ -84,7 +84,7 @@ void CreateObjects()
 
     // Adding references of vertices defined below through indexes
     unsigned int indices[] = {
-        0, 3, 1,    // side triangle
+        0, 3, 1,        // side triangle
         1, 3, 2,     // Each number indicates index of triangle vertices in vertices array
         2, 3, 0,
         0, 1, 2
@@ -99,6 +99,19 @@ void CreateObjects()
         0.0f,   1.0f,   0.0f,   0.5f,   1.0f,   0.0f, 0.0f, 0.0f,
     };  // These vertices will be stored in vertex index buffer and will be referenced to build geometry
 
+    unsigned int floorIndices[] = {
+        0, 2, 1,
+        1, 2, 3
+    };
+
+    // Defining Floor vertices and indices array
+    GLfloat floorVertices[] = {
+        -10.0f, 0.0f, -10.0f,   0.0f, 0.0f,     0.0, -1.0f, 0.0f,
+        10.0f, 0.0f, -10.0f,    10.0f, 0.0f,    0.0, -1.0f, 0.0f,    // 10.0f as UV value means it wll be repeated for 10 times
+        -10.0f, 0.0f, 10.0f,    0.0f, 10.0f,    0.0, -1.0f, 0.0f,
+        10.0f, 0.0f, 10.0f,     10.0f, 10.0f,   0.0, -1.0f, 0.0f
+    };
+
     calcAverageNormals(indices, 12, vertices, 32, 8, 5);
 
     Mesh* obj1 = new Mesh();
@@ -108,6 +121,10 @@ void CreateObjects()
     Mesh* obj2 = new Mesh();
     obj2->CreateMesh(vertices, indices, 32, 12);
     meshList.push_back(obj2);
+
+    Mesh* floor = new Mesh();
+    floor->CreateMesh(floorVertices, floorIndices, 32, 6);
+    meshList.push_back(floor);
 }
 
 void CreateShaders()
@@ -128,13 +145,14 @@ int main()
     CreateShaders();
     camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 1.0f, 1.0f);
 
-    char texturePath[25] = "Textures/brick2.png";
-    brickTexture = Texture(texturePath);
-    brickTexture.LoadTexture(); // To load texture into GPU
+    std::string texturePath = "Textures/brick2.png";
+    brickTexture = Texture((char* )texturePath.c_str());
+    brickTexture.LoadTexture();
 
-    strcpy_s(texturePath, "Textures/dirt.png");
-    dirtTexture = Texture(texturePath);
+    texturePath = "Textures/dirt.png";
+    dirtTexture = Texture((char*)texturePath.c_str());
     dirtTexture.LoadTexture();
+
 
     // Directional Light
     mainLight = DirectionalLight(
@@ -146,10 +164,17 @@ int main()
 
     unsigned int pointLightCount = 0;
     pointLights[0] = PointLight(
+        0.0f, 0.0f, 1.0f,
+        0.1f, 1.0f,
+        4.0f, 0.0f, 0.0f,
+        0.3f, 0.2f, 0.1f
+    );
+    pointLightCount++;
+    pointLights[1] = PointLight(
         0.0f, 1.0f, 0.0f,
         0.1f, 1.0f,
-        -4.0f, 0.0f, 0.0f,
-        0.3f, 0.2f, 0.1f
+        -4.0f, 2.0f, 0.0f,
+        0.3f, 0.1f, 0.1f
     );
     pointLightCount++;
 
@@ -221,6 +246,13 @@ int main()
         dirtTexture.UseTexture();
         dullMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
         meshList[1]->RenderMesh();
+        
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+        glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));  
+        dirtTexture.UseTexture();
+        dullMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+        meshList[2]->RenderMesh();
 
         glUseProgram(0);    // Unassigning to null
 
