@@ -120,9 +120,10 @@ void Shader::CompileShaders(const char* vShaderCode, const char* fShaderCode)
 	uniformDirectionalLight.uniformDiffuseIntensity = glGetUniformLocation(shader, "directionalLight.base.diffuseIntensity");
 	uniformDirectionalLight.uniformDirection = glGetUniformLocation(shader, "directionalLight.direction");
 
-	uniformPointLightCount = glGetUniformLocation(shader, "pointLightCount");
 
 	// Uniform values of Point Lights
+	uniformPointLightCount = glGetUniformLocation(shader, "pointLightCount");
+
 	for (size_t i = 0; i < MAX_POINT_LIGHTS; i++)
 	{
 		std::string uniformLocationString = "";

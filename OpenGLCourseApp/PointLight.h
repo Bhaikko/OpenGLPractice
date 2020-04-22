@@ -12,7 +12,7 @@ public:
 	);
 	~PointLight();
 
-private:
+protected:
 	glm::vec3 position;
 
 	GLfloat constant, linear, exponent;	// For attenuation Equation
@@ -20,10 +20,10 @@ private:
 
 public:
 	void UseLight(
-		GLfloat ambientLightIntensity, GLfloat ambientColorLocation,	// Ambient Light IDs
-		GLfloat diffuseIntensityLocation,								// Diffuse Light ID
-		GLfloat positionLocation,										// Point Light Location ID
-		GLfloat constantLocation, GLfloat linearLocation, GLfloat exponentLocation
+		GLuint ambientLightIntensity, GLuint ambientColorLocation,	// Ambient Light IDs
+		GLuint diffuseIntensityLocation,								// Diffuse Light ID
+		GLuint positionLocation,										// Point Light Location ID
+		GLuint constantLocation, GLuint linearLocation, GLuint exponentLocation
 	);
 };
 
