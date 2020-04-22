@@ -15,7 +15,7 @@ public:
 		GLfloat xPos, GLfloat yPos, GLfloat zPos,
 		GLfloat xDir, GLfloat yDir, GLfloat zDir,
 		GLfloat con, GLfloat lin, GLfloat exp,
-		GLfloat edge
+		GLfloat edge	// Edge is spread in degrees from Source
 	);
 
 	~SpotLight();

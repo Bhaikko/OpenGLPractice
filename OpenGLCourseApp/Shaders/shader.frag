@@ -48,7 +48,7 @@ uniform int spotLightCount;
                                                                 
 uniform DirectionalLight directionalLight;
 uniform PointLight pointLights[MAX_POINT_LIGHTS];
-uniform PointLight spotLights[MAX_SPOT_LIGHTS];
+uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 
 uniform sampler2D theTexture;   // This uses active texture set in Texture::UseTexture() 
 uniform Material material;
@@ -110,7 +110,7 @@ vec4 CalcSpotLight(SpotLight sLight)
     vec3 rayDirection = normalize(FragPos - sLight.base.position);
     float slFactor = dot(rayDirection, sLight.direction);   
 
-    if (slFactor > spotLight.edge) {
+    if (slFactor > sLight.edge) {
         vec4 color = CalcPointLight(sLight.base);
         return color;
     } else {
