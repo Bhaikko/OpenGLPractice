@@ -33,5 +33,8 @@ public:
 		GLuint constantLocation, GLuint linearLocation, GLuint exponentLocation,
 		GLuint edgeLocation
 	);
+
+	// To make spotlight follow camera
+	void SetFlash(glm::vec3 pos, glm::vec3 dir);
 };
 

@@ -231,6 +231,10 @@ int main()
         uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
         uniformShininess = shaderList[0].GetShininessLocation();
 
+        glm::vec3 lowerLight = camera.GetCameraPosition();
+        lowerLight.y -= 0.7f;
+        spotLights[0].SetFlash(lowerLight, camera.GetCameraDirection());
+
         //mainLight.UseLight(uniformAmbientIntensity, uniformAmbientColor, uniformDiffuseIntensity, uniformDirection);
         shaderList[0].SetDirectionalLight(&mainLight);
         shaderList[0].SetPointLights(pointLights, pointLightCount);

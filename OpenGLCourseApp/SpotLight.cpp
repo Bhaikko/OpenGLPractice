@@ -45,3 +45,9 @@ void SpotLight::UseLight(
 	glUniform3f(directionLocation, direction.x, direction.y, direction.z);
 	glUniform1f(edgeLocation, procEdge);
 }
+
+void SpotLight::SetFlash(glm::vec3 pos, glm::vec3 dir)
+{
+	position = pos;
+	direction = dir;
+}
