@@ -112,7 +112,9 @@ vec4 CalcSpotLight(SpotLight sLight)
 
     if (slFactor > sLight.edge) {
         vec4 color = CalcPointLight(sLight.base);
-        return color;
+
+        // Retuns a smooth edge around spotlight
+        return color * (1.0f - (1.0f - slFactor) * (1.0f / (1.0f - sLight.edge)));
     } else {
         return vec4(0.0f, 0.0f, 0.0f, 0.0f);
     }
