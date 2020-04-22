@@ -9,6 +9,7 @@
 
 #include "DirectionalLight.h"
 #include "PointLight.h"
+#include "SpotLight.h"
 
 class Shader
 {
@@ -41,11 +42,7 @@ public:
 
 // Light Configurations
 private:
-	int pointLightCount;
-
-	// To bind the above Point light count to shader point light count
-	GLuint uniformPointLightCount;
-
+	// DIRECTIONAL LIGHT
 	// Storing directional light IDs in struct
 	struct {
 		GLuint uniformColor;
@@ -54,7 +51,13 @@ private:
 
 		GLuint uniformDirection;
 	} uniformDirectionalLight;
-	
+
+
+	// POINT LIGHT
+	int pointLightCount;
+
+	// To bind the above Point light count to shader point light count
+	GLuint uniformPointLightCount;	
 
 	// Storing Point light IDs in struct for multiple point lights
 	struct {
@@ -68,8 +71,28 @@ private:
 		GLuint uniformExponent;
 	} uniformPointLight[MAX_POINT_LIGHTS];
 
+
+	// SPOT LIGHT
+	int spotLightCount;
+	GLuint uniformSpotLightCount;
+
+	struct {
+		GLuint uniformColor;
+		GLuint uniformAmbientIntensity;
+		GLuint uniformDiffuseIntensity;
+
+		GLuint uniformPosition;
+		GLuint uniformConstant;
+		GLuint uniformLinear;
+		GLuint uniformExponent;
+
+		GLuint uniformDirection;
+		GLuint uniformEdge;
+	} uniformSpotLight[MAX_SPOT_LIGHTS];
+
 public:
 	void SetDirectionalLight(DirectionalLight* dLight);
 	void SetPointLights(PointLight* pLights, unsigned int lightCount);
+	void SetSpotLights(SpotLight* sLights, unsigned int lightCount);
 };
 
