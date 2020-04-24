@@ -5,6 +5,9 @@
 #include <string>
 #include <GL/glew.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "CommonValues.h"
 
 #include "DirectionalLight.h"
@@ -22,7 +25,10 @@ public:
 
 private:
 	GLuint shader, uniformModel, uniformProjection, uniformView, uniformEyePosition,
-		uniformSpecularIntensity, uniformShininess;													// Material IDs
+		uniformSpecularIntensity, uniformShininess,	// Material IDs
+		uniformTexture,
+		uniformDirectionalLightTransform, uniformDirectionalShadowMap;
+
 	std::string readShaderFromFile(const char* shaderPath);
 	void AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType);
 	void CompileShaders(const char* vShaderCode, const char* fShaderCode);
@@ -94,5 +100,9 @@ public:
 	void SetDirectionalLight(DirectionalLight* dLight);
 	void SetPointLights(PointLight* pLights, unsigned int lightCount);
 	void SetSpotLights(SpotLight* sLights, unsigned int lightCount);
+
+	void SetTexture(GLuint textureUnit);
+	void SetDirectionalShadowMap(GLuint textureUnit);
+	void SetDirectionalLightTransform(glm::mat4* lTransform);
 };
 
