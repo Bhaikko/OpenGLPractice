@@ -7,20 +7,23 @@ DirectionalLight::DirectionalLight() : Light()
 	// but will be set in Light()
 
 	direction = glm::vec3(0.0f, -1.0f, 0.0f);
+	lightProj = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, 0.1f, 20.f);
 }
 
 DirectionalLight::DirectionalLight(
+	GLfloat shadowWidth, GLfloat shadowHeight,
 	GLfloat red, GLfloat green, GLfloat blue,
 	GLfloat aIntensity,	GLfloat dIntensity,	
 	GLfloat xDir, GLfloat yDir, GLfloat zDir
-) : Light(red, green, blue, aIntensity, dIntensity)
+) : Light(shadowWidth, shadowHeight, red, green, blue, aIntensity, dIntensity)
 {
 	direction = glm::vec3(xDir, yDir, zDir);
+	lightProj = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, 0.1f, 20.f);
 }
 
 DirectionalLight::~DirectionalLight()
 {
-
+	
 }
 
 void DirectionalLight::UseLight(
@@ -33,4 +36,17 @@ void DirectionalLight::UseLight(
 
 	glUniform3f(diffuseDirectionLocation, direction.x, direction.y, direction.z);
 	glUniform1f(diffuseIntensityLocation, diffuseIntensity);
+}
+
+glm::mat4 DirectionalLight::CalculateLightTransform()
+{
+	// Return Transform matrix where Projection and view matrix are combined already
+	// and not calculated in vertex shader
+
+	return	lightProj *		// Orthogonal Matrix
+			glm::lookAt(	// View Matrix
+				-direction, 
+				glm::vec3(0.0f, 0.0f, 0.0f), 
+				glm::vec3(0.0f, 1.0f, 0.0f)
+			);	
 }

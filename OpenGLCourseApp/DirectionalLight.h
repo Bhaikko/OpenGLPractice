@@ -8,6 +8,7 @@ public:
 	DirectionalLight();
 
 	DirectionalLight(
+		GLfloat shadowWidth, GLfloat shadowHeight,
 		GLfloat red, GLfloat green, GLfloat blue, 
 		GLfloat aIntensity,	// Ambient Lighting Params
 		GLfloat dIntensity,	// Diffuse Lighting Params
@@ -24,5 +25,7 @@ public:
 		GLfloat ambientLightIntensity, GLfloat ambientColorLocation,	// Ambient Light IDs
 		GLfloat diffuseIntensityLocation, GLfloat diffuseDirectionLocation
 	);
+
+	glm::mat4 CalculateLightTransform();
 };
 
