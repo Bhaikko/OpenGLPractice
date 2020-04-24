@@ -14,11 +14,19 @@ out vec3 FragPos;
 uniform mat4 model;                                             
 uniform mat4 projection;   
 uniform mat4 view;   
+
+// For directional shadow mapping
+out vec4 DirectionalLightSpacePos;
+
+uniform mat4 directionalLightTransform;     // To find fragment w.r.t to directional Light
+
                                                                 
 void main()                                                     
 {                                                               
-    gl_Position = projection * view * model * vec4(pos, 1.0);                       
+    gl_Position = projection * view * model * vec4(pos, 1.0);      
     // gl_Position = vec4(pos, 1.0);           
+    DirectionalLightSpacePos = directionalLightTransform * model * vec(pos, 1.0f);
+                     
     vCol = vec4(clamp(pos, 0.0f, 1.0f), 1.0f);    
 
     TexCoord = tex;
