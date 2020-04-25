@@ -71,7 +71,7 @@ float CalcDirectionalShadowFactor(DirectionalLight light)
 
     // Working using Orthogonal Projection
     // Tells if how it move w.r.t light when moved in x and y direction
-    float closetDepth = texture(directionalShadowMap, projCoords.xy).r;
+    float closetDepth = texture(directionalShadowMap, projCoords.xy).x;
 
     // Forward and backward values;
     float currentDepth = projCoords.z;  

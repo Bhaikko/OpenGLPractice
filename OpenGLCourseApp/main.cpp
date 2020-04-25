@@ -95,7 +95,7 @@ void CreateObjects()
     // Adding references of vertices defined below through indexes
     unsigned int indices[] = {
         0, 3, 1,        // side triangle
-        1, 3, 2,     // Each number indicates index of triangle vertices in vertices array
+        1, 3, 2,        // Each number indicates index of triangle vertices in vertices array
         2, 3, 0,
         0, 1, 2
     };
@@ -163,7 +163,7 @@ void RenderScene()
     meshList[0]->RenderMesh();
 
     model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 4.0f, -2.5f));
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, 2.5f));
     //model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
 
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
@@ -246,7 +246,7 @@ void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 
     glm::vec3 lowerLight = camera.GetCameraPosition();
     lowerLight.y -= 0.7f;
-    spotLights[0].SetFlash(lowerLight, camera.GetCameraDirection());
+    //spotLights[0].SetFlash(lowerLight, camera.GetCameraDirection());
 
     RenderScene();
 
@@ -275,8 +275,8 @@ int main()
         1024, 1024,
         1.0f, 1.0f, 1.0f, 
         0.1f,   // Ambient Light CFG
-        0.3f,   // Diffuse Light CFG
-        0.0f, 0.0f, -1.0f
+        0.6f,   // Diffuse Light CFG
+        0.0f, -7.0f, -1.0f
     );
 
 
@@ -339,3 +339,4 @@ int main()
     return 0;
 }
 
+// 1:23                                                      

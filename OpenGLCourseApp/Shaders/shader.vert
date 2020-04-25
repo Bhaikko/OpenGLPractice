@@ -25,7 +25,7 @@ void main()
 {                                                               
     gl_Position = projection * view * model * vec4(pos, 1.0);      
     // gl_Position = vec4(pos, 1.0);           
-    DirectionalLightSpacePos = directionalLightTransform * model * vec(pos, 1.0f);
+    DirectionalLightSpacePos = directionalLightTransform * model * vec4(pos, 1.0f);
                      
     vCol = vec4(clamp(pos, 0.0f, 1.0f), 1.0f);    
 
