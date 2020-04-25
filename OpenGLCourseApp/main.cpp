@@ -152,7 +152,7 @@ void RenderScene()
 {
     glm::mat4 model(1.0f);    // Creating Identity Matrix
 
-    model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));   // Copying [triOffset, 0, 0] vector as translation in model
+    model = glm::translate(model, glm::vec3(2.5f, 0.0f, -2.5f));   // Copying [triOffset, 0, 0] vector as translation in model
     //model = glm::rotate(model, angleOffset * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
     //model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
 

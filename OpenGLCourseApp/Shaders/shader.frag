@@ -71,7 +71,7 @@ float CalcDirectionalShadowFactor(DirectionalLight light)
 
     // Working using Orthogonal Projection
     // Tells if how it move w.r.t light when moved in x and y direction
-    float closetDepth = texture(directionalShadowMap, projCoords.xy).x;
+    // float closetDepth = texture(directionalShadowMap, projCoords.xy).x;
 
     // Forward and backward values;
     float currentDepth = projCoords.z;  
@@ -83,11 +83,24 @@ float CalcDirectionalShadowFactor(DirectionalLight light)
 
     float bias = max(0.05f * (1 - dot(normal, lightDir)), 0.005);
 
+    // Supersampling to average out pixel colors
+    // And to remove jaginess in shadows
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(directionalShadowMap, 0);    // Get texture size in texels
+
+    for (int x = -1; x <= 1; x++) {
+        for (int y = -1; y <= 1; y++) {
+            float pcfDepth = texture(directionalShadowMap, projCoords.xy + vec2(x, y) * texelSize).x;
+            shadow += currentDepth - bias > pcfDepth ? 1.0f : 0.0f; 
+        }
+    }
+
+    shadow /= 9;
 
     // Comparison of two objects, 
     // Wheather they are on same depth or not
     // 1.0f is full shadow, 0.0f is no shadow
-    float shadow = currentDepth - bias > closetDepth ? 1.0f : 0.0f; 
+    // float shadow = currentDepth - bias > closetDepth ? 1.0f : 0.0f; 
 
     // Discard shadows that are beyond the far plane of orthographic view frustum
     if (projCoords.z > 1.0f) {
