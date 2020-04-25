@@ -76,10 +76,23 @@ float CalcDirectionalShadowFactor(DirectionalLight light)
     // Forward and backward values;
     float currentDepth = projCoords.z;  
 
+    // Bias is used to fix conflict between light and camera,
+    // which creates an artifact/acne of block lines on geometry
+    vec3 normal = normalize(Normal);
+    vec3 lightDir = normalize(light.direction);
+
+    float bias = max(0.05f * (1 - dot(normal, lightDir)), 0.005);
+
+
     // Comparison of two objects, 
     // Wheather they are on same depth or not
     // 1.0f is full shadow, 0.0f is no shadow
-    float shadow = currentDepth > closetDepth ? 1.0f : 0.0f; 
+    float shadow = currentDepth - bias > closetDepth ? 1.0f : 0.0f; 
+
+    // Discard shadows that are beyond the far plane of orthographic view frustum
+    if (projCoords.z > 1.0f) {
+        shadow = 0.0f;
+    }
 
     return shadow;
 }

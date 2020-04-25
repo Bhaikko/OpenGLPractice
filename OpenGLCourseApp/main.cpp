@@ -272,7 +272,7 @@ int main()
 
     // Directional Light
     mainLight = DirectionalLight(
-        1024, 1024,
+        2048, 2048,
         1.0f, 1.0f, 1.0f, 
         0.1f,   // Ambient Light CFG
         0.6f,   // Diffuse Light CFG
@@ -337,6 +337,4 @@ int main()
 
 
     return 0;
-}
-
-// 1:23                                                      
+}                                                    
