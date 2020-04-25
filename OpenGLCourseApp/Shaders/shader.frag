@@ -53,8 +53,8 @@ uniform DirectionalLight directionalLight;
 uniform PointLight pointLights[MAX_POINT_LIGHTS];
 uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 
-uniform sampler2D theTexture;           // This uses active texture set in Texture::UseTexture() 
-uniform sampler2D directionalShadowMap; // Texture to apply after shadow mapping
+uniform sampler2D theTexture;           // This uses active texture set in Texture::UseTexture(), GL_TEXTURE0
+uniform sampler2D directionalShadowMap; // Texture to apply after shadow mapping, GL_TEXTURE1
 
 uniform Material material;
 

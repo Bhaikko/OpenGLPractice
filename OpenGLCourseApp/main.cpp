@@ -28,6 +28,8 @@ const float toRadians = 3.14159265 / 180.0f;    // GLM library accepts radians s
 Window mainWindow;
 std::vector<Mesh*> meshList;
 std::vector<Shader> shaderList;
+Shader directionalShadowShader;
+
 Camera camera;
 
 Texture brickTexture;
@@ -49,6 +51,12 @@ static const char* vShader = "Shaders/shader.vert";
 
  //Fragment Shader Path
 static const char* fShader = "Shaders/shader.frag";
+
+GLuint  uniformModel, uniformProjection, uniformView, uniformEyePosition,
+        uniformSpecularIntensity, uniformShininess;
+
+unsigned int pointLightCount = 0;
+unsigned int spotLightCount = 0;
 
 void calcAverageNormals(unsigned int* indices, unsigned int indiceCount, GLfloat* vertices, unsigned int vertexCount, unsigned int vLength, unsigned int normalOffset)
 {
@@ -134,9 +142,115 @@ void CreateShaders()
     Shader* shader1 = new Shader();
     shader1->CreateFromFiles(vShader, fShader);
     shaderList.push_back(*shader1);
+
+    // Adding Shadowmap Shader
+    directionalShadowShader = Shader();
+    directionalShadowShader.CreateFromFiles("Shaders/directional_shadow_map.vert", "Shaders/directional_shadow_map.frag");
 }
 
+void RenderScene()
+{
+    glm::mat4 model(1.0f);    // Creating Identity Matrix
 
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));   // Copying [triOffset, 0, 0] vector as translation in model
+    //model = glm::rotate(model, angleOffset * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+    //model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
+
+    //glUniform1f(uniformXMove, triOffset);   // Assigning value in vertex shader by using the uniform value ID
+    glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));   // value_ptr is used to get pointer of matrix as in glm, matrix isnt stored directly as pointer
+    brickTexture.UseTexture();  // Use the loaded texture
+    shinyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+    meshList[0]->RenderMesh();
+
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, 4.0f, -2.5f));
+    //model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
+
+    glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+    dirtTexture.UseTexture();
+    dullMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+    meshList[1]->RenderMesh();
+
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+    glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+    dirtTexture.UseTexture();
+    dullMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+    meshList[2]->RenderMesh();
+}
+
+void DirectionalShadowMapPass(DirectionalLight* light)
+{   
+    // Directional Shadow Map pass for its framebuffer
+    directionalShadowShader.UseShader();
+
+    // To make viewport and shadowmap of same dimensions
+    glViewport(0, 0, light->GetShadowMap()->GetShadowWidth(), light->GetShadowMap()->GetShadowHeight());
+
+    // Entering wrtie mode for our shadow map frame buffer
+    light->GetShadowMap()->Write();
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    uniformModel = directionalShadowShader.GetModelLocation();
+    directionalShadowShader.SetDirectionalLightTransform(&light->CalculateLightTransform());
+
+    RenderScene();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+}
+
+void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
+{
+    shaderList[0].UseShader();   // using 'shader' id as program to run
+
+    uniformModel = shaderList[0].GetModelLocation();
+    uniformProjection = shaderList[0].GetProjectionLocation();
+    uniformView = shaderList[0].GetViewLocation();
+
+    // Since Directional Light IDs are handled by Shader itself, Hence the below IDs are useless
+    /*
+        uniformAmbientColor = shaderList[0].GetAmbientColorLocation();
+        uniformAmbientIntensity = shaderList[0].GetAmbientIntensityLocation();
+        uniformDirection = shaderList[0].GetDirectionLocation();
+        uniformDiffuseIntensity = shaderList[0].GetDiffuseIntensityLocation();
+    */
+
+    glViewport(0, 0, 1280, 720);
+
+
+    // Clear Window
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);   // clears window and fresh start!!!
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Combining frame and depth buffer
+
+    uniformEyePosition = shaderList[0].GetEyePositionLocation();
+    uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
+    uniformShininess = shaderList[0].GetShininessLocation();
+
+    glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+    glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+    glUniform3f(uniformEyePosition, camera.GetCameraPosition().x, camera.GetCameraPosition().y, camera.GetCameraPosition().z);
+
+    // Setting Up uniform values of oights in shader
+    //mainLight.UseLight(uniformAmbientIntensity, uniformAmbientColor, uniformDiffuseIntensity, uniformDirection);
+    shaderList[0].SetDirectionalLight(&mainLight);
+    shaderList[0].SetPointLights(pointLights, pointLightCount);
+    shaderList[0].SetSpotLights(spotLights, spotLightCount);
+
+    // Settng up uniform value for shadowMap for directional light
+    shaderList[0].SetDirectionalLightTransform(&mainLight.CalculateLightTransform());
+
+    mainLight.GetShadowMap()->Read(GL_TEXTURE1);
+    shaderList[0].SetTexture(0);
+    shaderList[0].SetDirectionalShadowMap(1);
+
+    glm::vec3 lowerLight = camera.GetCameraPosition();
+    lowerLight.y -= 0.7f;
+    spotLights[0].SetFlash(lowerLight, camera.GetCameraDirection());
+
+    RenderScene();
+
+}
 
 int main()
 {
@@ -152,19 +266,20 @@ int main()
     brickTexture.LoadTexture();
 
     texturePath = "Textures/dirt.png";
-    dirtTexture = Texture((char*)texturePath.c_str());
+    dirtTexture = Texture((char* )texturePath.c_str());
     dirtTexture.LoadTexture();
 
 
     // Directional Light
     mainLight = DirectionalLight(
+        1024, 1024,
         1.0f, 1.0f, 1.0f, 
         0.1f,   // Ambient Light CFG
         0.3f,   // Diffuse Light CFG
         0.0f, 0.0f, -1.0f
     );
 
-    unsigned int pointLightCount = 0;
+
     pointLights[0] = PointLight(
         0.0f, 0.0f, 1.0f,
         0.1f, 0.1f,
@@ -180,7 +295,6 @@ int main()
     );
     //pointLightCount++;
 
-    unsigned int spotLightCount = 0;
     spotLights[0] = SpotLight(
         1.0f, 1.0f, 1.0f,
         0.1f, 1.0f,
@@ -194,8 +308,7 @@ int main()
     shinyMaterial = Material(1.0f, 32.0f);
     dullMaterial = Material(0.3f, 4.0f);
 
-    GLuint uniformModel, uniformProjection, uniformView, uniformEyePosition,
-        uniformSpecularIntensity, uniformShininess;
+
     glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / (GLfloat)mainWindow.getBufferHeight(), 0.1f, 100.0f);
 
     // Loop until window closed
@@ -210,68 +323,12 @@ int main()
         camera.KeyControl(mainWindow.getKeys(), deltaTime);    // Passing reference of keys to Camera
         camera.MouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 
-        // Clear Window
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);   // clears window and fresh start!!!
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Combining frame and depth buffer
-
-        shaderList[0].UseShader();   // using 'shader' id as program to run
-        uniformModel = shaderList[0].GetModelLocation();
-        uniformProjection = shaderList[0].GetProjectionLocation();
-        uniformView = shaderList[0].GetViewLocation();
-
-        // Since Directional Light IDs are handled by Shader itself, Hence the below IDs are useless
-        /*
-            uniformAmbientColor = shaderList[0].GetAmbientColorLocation();
-            uniformAmbientIntensity = shaderList[0].GetAmbientIntensityLocation();
-            uniformDirection = shaderList[0].GetDirectionLocation();
-            uniformDiffuseIntensity = shaderList[0].GetDiffuseIntensityLocation();
-        */
-
-        uniformEyePosition = shaderList[0].GetEyePositionLocation();
-        uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
-        uniformShininess = shaderList[0].GetShininessLocation();
-
-        glm::vec3 lowerLight = camera.GetCameraPosition();
-        lowerLight.y -= 0.7f;
-        spotLights[0].SetFlash(lowerLight, camera.GetCameraDirection());
-
-        //mainLight.UseLight(uniformAmbientIntensity, uniformAmbientColor, uniformDiffuseIntensity, uniformDirection);
-        shaderList[0].SetDirectionalLight(&mainLight);
-        shaderList[0].SetPointLights(pointLights, pointLightCount);
-        shaderList[0].SetSpotLights(spotLights, spotLightCount);
-
-        glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
-        glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.CalculateViewMatrix()));
-        glUniform3f(uniformEyePosition, camera.GetCameraPosition().x, camera.GetCameraPosition().y, camera.GetCameraPosition().z);
-
-        glm::mat4 model(1.0f);    // Creating Identity Matrix
-
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));   // Copying [triOffset, 0, 0] vector as translation in model
-        //model = glm::rotate(model, angleOffset * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-        //model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
+        // This will write shadowmap to a frame buffer
+        // Which will be used as texture and will be mapped 
+        // using Fragment shader
+        DirectionalShadowMapPass(&mainLight);
+        RenderPass(projection, camera.CalculateViewMatrix());
         
-        //glUniform1f(uniformXMove, triOffset);   // Assigning value in vertex shader by using the uniform value ID
-        glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));   // value_ptr is used to get pointer of matrix as in glm, matrix isnt stored directly as pointer
-        brickTexture.UseTexture();  // Use the loaded texture
-        shinyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-        meshList[0]->RenderMesh();
-        
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 4.0f, -2.5f));
-        //model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
-
-        glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));  
-        dirtTexture.UseTexture();
-        dullMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-        meshList[1]->RenderMesh();
-        
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
-        glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));  
-        dirtTexture.UseTexture();
-        dullMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-        meshList[2]->RenderMesh();
-
         glUseProgram(0);    // Unassigning to null
 
         mainWindow.SwapBuffers();    // Buffer swapping, You know it bhaikko, You read it in books
