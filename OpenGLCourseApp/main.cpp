@@ -148,11 +148,14 @@ void CreateShaders()
     directionalShadowShader.CreateFromFiles("Shaders/directional_shadow_map.vert", "Shaders/directional_shadow_map.frag");
 }
 
+GLfloat currentX = 2.5f;
+GLfloat offset = 0.0f;
+
 void RenderScene()
 {
     glm::mat4 model(1.0f);    // Creating Identity Matrix
 
-    model = glm::translate(model, glm::vec3(2.5f, 0.0f, -2.5f));   // Copying [triOffset, 0, 0] vector as translation in model
+    model = glm::translate(model, glm::vec3(currentX + offset, 0.0f, -2.5f));   // Copying [triOffset, 0, 0] vector as translation in model
     //model = glm::rotate(model, angleOffset * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
     //model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
 
@@ -317,6 +320,9 @@ int main()
         deltaTime = now - lastTime;
         lastTime = now;
 
+        offset = sin(glfwGetTime()) * 200.0f * deltaTime;
+
+
         // Get and handle user input events
         glfwPollEvents();
 
@@ -332,7 +338,6 @@ int main()
         glUseProgram(0);    // Unassigning to null
 
         mainWindow.SwapBuffers();    // Buffer swapping, You know it bhaikko, You read it in books
-        glfwWaitEvents();   // Fixes the loading cursor bug
     }
 
 
