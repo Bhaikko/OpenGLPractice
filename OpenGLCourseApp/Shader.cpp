@@ -18,6 +18,15 @@ void Shader::CreateFromFiles(const char* vShader, const char* fShader)
 	CompileShaders(vShaderCode.c_str(), fShaderCode.c_str());
 }
 
+void Shader::CreateFromFiles(const char* vShader, const char* gShader, const char* fShader)
+{
+	std::string vShaderCode = readShaderFromFile(vShader);
+	std::string gShaderCode = readShaderFromFile(gShader);
+	std::string fShaderCode = readShaderFromFile(fShader);
+
+	CompileShaders(vShaderCode.c_str(), gShaderCode.c_str(), fShaderCode.c_str());
+}
+
 Shader::~Shader()
 {
 
@@ -90,6 +99,31 @@ void Shader::CompileShaders(const char* vShaderCode, const char* fShaderCode)
 	AddShader(shader, vShaderCode, GL_VERTEX_SHADER);
 	AddShader(shader, fShaderCode, GL_FRAGMENT_SHADER);
 
+	CompileProgram();
+
+}
+
+void Shader::CompileShaders(const char* vShaderCode, const char* gShaderCode, const char* fShaderCode)
+{
+	shader = glCreateProgram(); // creates 'shader' as program
+
+	if (!shader) {
+		std::cout << "Error creating shader program" << std::endl;
+		return;
+	}
+
+	// The below 4 line of code detects error in shaders code
+	// Specifying Type of shader and its code
+	AddShader(shader, vShaderCode, GL_VERTEX_SHADER);
+	AddShader(shader, gShaderCode, GL_GEOMETRY_SHADER);
+	AddShader(shader, fShaderCode, GL_FRAGMENT_SHADER);
+
+	CompileProgram();
+
+}
+
+void Shader::CompileProgram()
+{
 	// error codes and result
 	GLint result = 0;
 	GLchar eLog[1024] = { 0 };
@@ -112,8 +146,8 @@ void Shader::CompileShaders(const char* vShaderCode, const char* fShaderCode)
 
 	// Uniform values of Transform Matrices
 	uniformModel = glGetUniformLocation(shader, "model");   // Get id of uniform variable declared in vertex shader using current vertex shader id
-	uniformProjection = glGetUniformLocation(shader, "projection");   
-	uniformView = glGetUniformLocation(shader, "view");   
+	uniformProjection = glGetUniformLocation(shader, "projection");
+	uniformView = glGetUniformLocation(shader, "view");
 	uniformEyePosition = glGetUniformLocation(shader, "eyePosition");
 
 	// Uniform values of Directional Light
@@ -206,7 +240,6 @@ void Shader::CompileShaders(const char* vShaderCode, const char* fShaderCode)
 		uniformLocationString = "lightMatrices[" + std::to_string(i) + "]";
 		uniformLightMatrices[i] = glGetUniformLocation(shader, uniformLocationString.c_str());
 	}
-
 }
 
 void Shader::SetDirectionalLight(DirectionalLight* dLight)

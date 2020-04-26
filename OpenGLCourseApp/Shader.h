@@ -19,6 +19,7 @@ class Shader
 public:
 	Shader();
 	void CreateFromFiles(const char* vShader, const char* fShader);
+	void CreateFromFiles(const char* vShader, const char* gShader, const char* fShader);
 	void UseShader() { glUseProgram(this->shader); }
 	
 	~Shader();
@@ -35,7 +36,11 @@ private:
 
 	std::string readShaderFromFile(const char* shaderPath);
 	void AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType);
+
 	void CompileShaders(const char* vShaderCode, const char* fShaderCode);
+	void CompileShaders(const char* vShaderCode, const char* gShaderCode, const char* fShaderCode);
+
+	void CompileProgram();
 
 public:
 	GLuint GetModelLocation() { return this->uniformModel; }
