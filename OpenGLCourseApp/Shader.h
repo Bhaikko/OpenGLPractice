@@ -53,6 +53,7 @@ public:
 	GLuint GetSpecularIntensityLocation() { return this->uniformSpecularIntensity; }
 	GLuint GetShininessLocation() { return this->uniformShininess; }
 	GLuint GetEyePositionLocation() { return this->uniformEyePosition; }
+	GLuint GetOmniLightPosLocation() { return this->uniformOmniLightPos; }
 	GLuint GetOmniLightLocation() { return this->uniformOmniLightPos; }
 	GLuint GetFarPlaneLocation() { return this->uniformFarPlane; }
 
@@ -116,6 +117,6 @@ public:
 	void SetDirectionalShadowMap(GLuint textureUnit);
 	void SetDirectionalLightTransform(glm::mat4* lTransform);
 
-	void SetLightMatrices(std::vector<glm::vec4> lightMatrices);
+	void SetLightMatrices(std::vector<glm::mat4> lightMatrices);
 };
 
