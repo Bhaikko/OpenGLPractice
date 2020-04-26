@@ -196,6 +196,16 @@ void Shader::CompileShaders(const char* vShaderCode, const char* fShaderCode)
 	uniformDirectionalLightTransform = glGetUniformLocation(shader, "directionalLightTransform");
 	uniformDirectionalShadowMap = glGetUniformLocation(shader, "directionalShadowMap");
 
+	// Uniform values for Cube Map
+	uniformOmniLightPos = glGetUniformLocation(shader, "lightPos");
+	uniformFarPlane = glGetUniformLocation(shader, "farPlane");
+
+	for (size_t i = 0; i < 6; i++) {
+		std::string uniformLocationString = "";
+
+		uniformLocationString = "lightMatrices[" + std::to_string(i) + "]";
+		uniformLightMatrices[i] = glGetUniformLocation(shader, uniformLocationString.c_str());
+	}
 
 }
 
@@ -256,5 +266,13 @@ void Shader::SetDirectionalShadowMap(GLuint textureUnit)
 void Shader::SetDirectionalLightTransform(glm::mat4* lTransform)
 {
 	glUniformMatrix4fv(uniformDirectionalLightTransform, 1, GL_FALSE, glm::value_ptr(*lTransform));
+}
+
+void Shader::SetLightMatrices(std::vector<glm::vec4> lightMatrices)
+{
+	for (size_t i = 0; i < 6; i++) {
+		glUniformMatrix4fv(uniformLightMatrices[i], 1, GL_FALSE, glm::value_ptr(lightMatrices[i]));
+	}
+
 }
 

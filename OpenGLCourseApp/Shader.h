@@ -27,7 +27,11 @@ private:
 	GLuint shader, uniformModel, uniformProjection, uniformView, uniformEyePosition,
 		uniformSpecularIntensity, uniformShininess,	// Material IDs
 		uniformTexture,
-		uniformDirectionalLightTransform, uniformDirectionalShadowMap;
+		uniformDirectionalLightTransform, uniformDirectionalShadowMap,
+		uniformOmniLightPos, uniformFarPlane;
+
+	// Cube map transformation matrices
+	GLuint uniformLightMatrices[6];
 
 	std::string readShaderFromFile(const char* shaderPath);
 	void AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType);
@@ -44,6 +48,8 @@ public:
 	GLuint GetSpecularIntensityLocation() { return this->uniformSpecularIntensity; }
 	GLuint GetShininessLocation() { return this->uniformShininess; }
 	GLuint GetEyePositionLocation() { return this->uniformEyePosition; }
+	GLuint GetOmniLightLocation() { return this->uniformOmniLightPos; }
+	GLuint GetFarPlaneLocation() { return this->uniformFarPlane; }
 
 
 // Light Configurations
@@ -104,5 +110,7 @@ public:
 	void SetTexture(GLuint textureUnit);
 	void SetDirectionalShadowMap(GLuint textureUnit);
 	void SetDirectionalLightTransform(glm::mat4* lTransform);
+
+	void SetLightMatrices(std::vector<glm::vec4> lightMatrices);
 };
 
