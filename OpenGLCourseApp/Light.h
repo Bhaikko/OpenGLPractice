@@ -6,6 +6,8 @@
 
 #include "ShadowMap.h"
 
+#include <vector>
+
 class Light
 {
 public:
