@@ -56,7 +56,7 @@ bool ShadowMap::Init(GLuint width, GLuint height)
 void ShadowMap::Write()
 {
 	// to set current frame buffer to this from the one used to draw texture on screen
-	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FBO);
 }
 
 void ShadowMap::Read(GLenum textureUnit)
