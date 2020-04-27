@@ -10,12 +10,12 @@ OmniShadowMap::~OmniShadowMap()
 
 }
 
-bool OmniShadowMap::Init(GLuint width, GLuint height) 
+bool OmniShadowMap::Init(unsigned int width, unsigned int height)
 {
 	shadowWidth = width;
 	shadowHeight = height;
 
-	glGenBuffers(1, &FBO);
+	glGenFramebuffers(1, &FBO);
 
 	glGenTextures(1, &shadowMap);
 	// Binding a cube map instead of 2D texture

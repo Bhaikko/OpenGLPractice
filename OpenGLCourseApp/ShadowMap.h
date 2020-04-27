@@ -15,12 +15,12 @@ public:
 protected:
 	GLuint FBO;			// ID for Frame Buffer
 	GLuint shadowMap;	// ID for shadow map as texture
-	GLuint shadowWidth, shadowHeight;
+	unsigned int shadowWidth, shadowHeight;
 
 public:
 
 	// Used to setup Framebuffer
-	virtual bool Init(GLuint width, GLuint height);
+	virtual bool Init(unsigned int width, unsigned int height);
 
 	virtual void Write();
 
@@ -28,7 +28,7 @@ public:
 	virtual void Read(GLenum textureUnit);		
 
 public:
-	GLuint GetShadowWidth() { return shadowWidth; }
-	GLuint GetShadowHeight() { return shadowHeight; }
+	unsigned int GetShadowWidth() { return shadowWidth; }
+	unsigned int GetShadowHeight() { return shadowHeight; }
 };
 

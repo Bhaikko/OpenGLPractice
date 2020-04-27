@@ -4,7 +4,7 @@
 #version 330
 
 layout (triangles) in;                          // Input of geometry shader
-layout (traingle_strip, max_vertices = 18) out; // max_vertices to out of this shader = 18, output
+layout (triangle_strip, max_vertices = 18) out; // max_vertices to out of this shader = 18, output
 
 uniform mat4 lightMatrices[6];
 

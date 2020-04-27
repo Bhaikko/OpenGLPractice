@@ -7,7 +7,7 @@ public:
 	~OmniShadowMap();
 
 public:
-	bool Init(GLuint width, GLuint height) override;
+	bool Init(unsigned int width, unsigned int height) override;
 	void Write() override;
 	void Read(GLenum textureUnit) override;
 };
