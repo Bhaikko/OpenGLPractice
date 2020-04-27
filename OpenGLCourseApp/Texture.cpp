@@ -58,7 +58,7 @@ void Texture::ClearTexture()
 void Texture::UseTexture()
 {
 	// Below code binds the texture in memory associated with TextureID to Texture0 (unit)
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 }
 

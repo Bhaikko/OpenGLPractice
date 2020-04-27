@@ -108,10 +108,16 @@ private:
 		GLuint uniformEdge;
 	} uniformSpotLight[MAX_SPOT_LIGHTS];
 
+	// OMNISHADOW MAP
+	struct {
+		GLuint shadowMap;
+		GLuint farPlane;
+	} uniformOmniShadowMap[MAX_POINT_LIGHTS + MAX_SPOT_LIGHTS]; 
+
 public:
 	void SetDirectionalLight(DirectionalLight* dLight);
-	void SetPointLights(PointLight* pLights, unsigned int lightCount);
-	void SetSpotLights(SpotLight* sLights, unsigned int lightCount);
+	void SetPointLights(PointLight* pLights, unsigned int lightCount, unsigned int textureUnit, unsigned int offset);
+	void SetSpotLights(SpotLight* sLights, unsigned int lightCount, unsigned int textureUnit, unsigned int offset);
 
 	void SetTexture(GLuint textureUnit);
 	void SetDirectionalShadowMap(GLuint textureUnit);

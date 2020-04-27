@@ -267,19 +267,19 @@ void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
     // Setting Up uniform values of oights in shader
     //mainLight.UseLight(uniformAmbientIntensity, uniformAmbientColor, uniformDiffuseIntensity, uniformDirection);
     shaderList[0].SetDirectionalLight(&mainLight);
-    shaderList[0].SetPointLights(pointLights, pointLightCount);
-    shaderList[0].SetSpotLights(spotLights, spotLightCount);
+    shaderList[0].SetPointLights(pointLights, pointLightCount, 3, 0);
+    shaderList[0].SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
 
     // Settng up uniform value for shadowMap for directional light
     shaderList[0].SetDirectionalLightTransform(&mainLight.CalculateLightTransform());
 
-    mainLight.GetShadowMap()->Read(GL_TEXTURE1);
-    shaderList[0].SetTexture(0);
-    shaderList[0].SetDirectionalShadowMap(1);
+    mainLight.GetShadowMap()->Read(GL_TEXTURE2);
+    shaderList[0].SetTexture(1);
+    shaderList[0].SetDirectionalShadowMap(2);
 
     glm::vec3 lowerLight = camera.GetCameraPosition();
-    lowerLight.y -= 0.7f;
-    //spotLights[0].SetFlash(lowerLight, camera.GetCameraDirection());
+    //lowerLight.y -= 0.7f;
+    spotLights[0].SetFlash(lowerLight, camera.GetCameraDirection());
 
     RenderScene();
 
@@ -308,8 +308,8 @@ int main()
         2048, 2048,
         1.0f, 1.0f, 1.0f, 
         0.1f,   // Ambient Light CFG
-        0.6f,   // Diffuse Light CFG
-        0.0f, -7.0f, -1.0f
+        1.0f,   // Diffuse Light CFG
+        0.0f, -15.0f, -10.0f
     );
 
 
@@ -317,9 +317,9 @@ int main()
         1024, 1024,
         0.01f, 100.0f,
         0.0f, 0.0f, 1.0f,
-        0.1f, 0.1f,
-        4.0f, 0.0f, 0.0f,
-        0.3f, 0.2f, 0.1f
+        0.1f, 1.0f,
+        4.0f, 2.0f, 0.0f,
+        0.3f, 0.1f, 0.1f
     );
     pointLightCount++;
 
@@ -327,8 +327,8 @@ int main()
         1024, 1024,
         0.01, 100.0f,
         0.0f, 1.0f, 0.0f,
-        0.1f, 0.1f,
-        -4.0f, 2.0f, 0.0f,
+        0.1f, 1.0f,
+        -4.0f, 3.0f, 0.0f,
         0.3f, 0.1f, 0.1f
     );
     pointLightCount++;
@@ -337,7 +337,7 @@ int main()
         1024, 1024,
         0.01, 100.0f,
         1.0f, 1.0f, 1.0f,
-        0.1f, 1.0f,
+        1.0f, 1.0f,
         4.0f, 0.0f, 0.0f,
         0.0f, -1.0f, 0.0f,
         0.3f, 0.2f, 0.1f,
