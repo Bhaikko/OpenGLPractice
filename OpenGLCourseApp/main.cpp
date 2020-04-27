@@ -292,7 +292,7 @@ int main()
     
     CreateObjects();
     CreateShaders();
-    camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 1.0f, 1.0f);
+    camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 10.0f, 1.0f);
 
     std::string texturePath = "Textures/brick2.png";
     brickTexture = Texture((char* )texturePath.c_str());
@@ -388,4 +388,4 @@ int main()
 
 
     return 0;
-}                                                    
+}                                         
