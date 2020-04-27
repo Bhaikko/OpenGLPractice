@@ -131,8 +131,8 @@ float CalcOmniShadowFactor(PointLight light, int shadowIndex)
     for (float x = -offset; x < offset; x += offset / (samples * 0.5)) {
         for (float y = -offset; y < offset; y += offset / (samples * 0.5)) {
             for (float z = -offset; z < offset; z += offset / (samples * 0.5)) {
-                float closetDepth = texture(omniShadowMaps[shadowIndex].shadowMap, fragToLight).x;   // Since shadowmaps have only One Value
-                closetDepth *= omniShadowMaps[shadowIndex].farPlane;
+                float closetDepth = texture(omniShadowMaps[shadowIndex].shadowMap, fragToLight + vec3(x, y, z)).x;   // Since shadowmaps have only One Value
+                closetDepth *= omniShadowMaps[shadowIndex].farPlane;    // since in omni_shadow_map.frag, we normalized the closet
 
                 if (currentDepth - bias > closetDepth) {
                     shadow += 1.0f;

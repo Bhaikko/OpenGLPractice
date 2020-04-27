@@ -20,6 +20,9 @@ public:
 	Shader();
 	void CreateFromFiles(const char* vShader, const char* fShader);
 	void CreateFromFiles(const char* vShader, const char* gShader, const char* fShader);
+	
+	void Validate();
+	
 	void UseShader() { glUseProgram(this->shader); }
 	
 	~Shader();
@@ -109,6 +112,7 @@ private:
 	} uniformSpotLight[MAX_SPOT_LIGHTS];
 
 	// OMNISHADOW MAP
+
 	struct {
 		GLuint shadowMap;
 		GLuint farPlane;

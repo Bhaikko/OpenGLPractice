@@ -27,6 +27,8 @@ void Shader::CreateFromFiles(const char* vShader, const char* gShader, const cha
 	CompileShaders(vShaderCode.c_str(), gShaderCode.c_str(), fShaderCode.c_str());
 }
 
+
+
 Shader::~Shader()
 {
 
@@ -122,6 +124,21 @@ void Shader::CompileShaders(const char* vShaderCode, const char* gShaderCode, co
 
 }
 
+void Shader::Validate()
+{
+	// error codes and result
+	GLint result = 0;
+	GLchar eLog[1024] = { 0 };
+
+	glValidateProgram(shader);  // If current program is in context with opengl version
+	glGetProgramiv(shader, GL_VALIDATE_STATUS, &result);    // Gets status of 'shader' program
+	if (!result) {
+		glGetProgramInfoLog(shader, sizeof(eLog), NULL, eLog);
+		std::cout << "Error Validating Program: " << eLog << std::endl;
+		return;
+	}
+}
+
 void Shader::CompileProgram()
 {
 	// error codes and result
@@ -136,13 +153,7 @@ void Shader::CompileProgram()
 		return;
 	}
 
-	glValidateProgram(shader);  // If current program is in context with opengl version
-	glGetProgramiv(shader, GL_VALIDATE_STATUS, &result);    // Gets status of 'shader' program
-	if (!result) {
-		glGetProgramInfoLog(shader, sizeof(eLog), NULL, eLog);
-		std::cout << "Error Validating Program: " << eLog << std::endl;
-		return;
-	}
+	
 
 	// Uniform values of Transform Matrices
 	uniformModel = glGetUniformLocation(shader, "model");   // Get id of uniform variable declared in vertex shader using current vertex shader id

@@ -201,6 +201,8 @@ void DirectionalShadowMapPass(DirectionalLight* light)
     uniformModel = directionalShadowShader.GetModelLocation();
     directionalShadowShader.SetDirectionalLightTransform(&light->CalculateLightTransform());
 
+    directionalShadowShader.Validate();
+
     RenderScene();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -227,6 +229,8 @@ void OmniShadowMapPass(PointLight* light)
     glUniform1f(uniformFarPlane, light->GetFarPlane());
 
     omniShadowShader.SetLightMatrices(light->CalculateLightTransform());
+
+    omniShadowShader.Validate();
 
     RenderScene();
 
@@ -278,8 +282,10 @@ void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
     shaderList[0].SetDirectionalShadowMap(2);
 
     glm::vec3 lowerLight = camera.GetCameraPosition();
-    //lowerLight.y -= 0.7f;
+    lowerLight.y -= 0.5f;
     spotLights[0].SetFlash(lowerLight, camera.GetCameraDirection());
+
+    shaderList[0].Validate();
 
     RenderScene();
 
@@ -308,7 +314,7 @@ int main()
         2048, 2048,
         1.0f, 1.0f, 1.0f, 
         0.1f,   // Ambient Light CFG
-        1.0f,   // Diffuse Light CFG
+        0.4f,   // Diffuse Light CFG
         0.0f, -15.0f, -10.0f
     );
 
