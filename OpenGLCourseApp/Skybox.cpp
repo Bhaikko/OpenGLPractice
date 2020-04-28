@@ -62,7 +62,7 @@ Skybox::Skybox(std::vector<std::string> faceLocations)
 	// Since in cube maps, Texels are refered by vector not YV coordinates
 	// Hence (0, 0) for UV coordinates
 	// as well as no lighting effects, Hence no normals
-	float skyboxVertices[] = {
+	GLfloat skyboxVertices[] = {
 		-1.0f, 1.0f, -1.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
 		-1.0f, -1.0f, -1.0f,	0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
 		1.0f, 1.0f, -1.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
@@ -89,6 +89,8 @@ void Skybox::DrawSkybox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 
 	// Disabling Depth mask
 	glDepthMask(GL_FALSE);
+
+	skyShader->UseShader();
 
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
