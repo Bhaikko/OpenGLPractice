@@ -23,6 +23,8 @@
 #include "SpotLight.h"
 #include "Material.h"
 
+#include "Skybox.h"
+
 const float toRadians = 3.14159265 / 180.0f;    // GLM library accepts radians so need to convert all degree angle
 
 Window mainWindow;
@@ -43,6 +45,8 @@ Material dullMaterial;
 DirectionalLight mainLight;
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
+
+Skybox skybox;
 
 // Delta Time Setup
 GLfloat deltaTime = 0.0f;
@@ -239,28 +243,22 @@ void OmniShadowMapPass(PointLight* light)
 
 void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 {
-    shaderList[0].UseShader();   // using 'shader' id as program to run
-
-    uniformModel = shaderList[0].GetModelLocation();
-    uniformProjection = shaderList[0].GetProjectionLocation();
-    uniformView = shaderList[0].GetViewLocation();
-
-    // Since Directional Light IDs are handled by Shader itself, Hence the below IDs are useless
-    /*
-        uniformAmbientColor = shaderList[0].GetAmbientColorLocation();
-        uniformAmbientIntensity = shaderList[0].GetAmbientIntensityLocation();
-        uniformDirection = shaderList[0].GetDirectionLocation();
-        uniformDiffuseIntensity = shaderList[0].GetDiffuseIntensityLocation();
-    */
 
     glViewport(0, 0, 1280, 720);
-
 
     // Clear Window
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);   // clears window and fresh start!!!
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Combining frame and depth buffer
 
+    skybox.DrawSkybox(viewMatrix, projectionMatrix);
+
+    shaderList[0].UseShader();   // using 'shader' id as program to run
+
+    uniformModel = shaderList[0].GetModelLocation();
+    uniformProjection = shaderList[0].GetProjectionLocation();
+    uniformView = shaderList[0].GetViewLocation();
     uniformEyePosition = shaderList[0].GetEyePositionLocation();
+
     uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
     uniformShininess = shaderList[0].GetShininessLocation();
 
@@ -350,6 +348,17 @@ int main()
         20.0f
     );
     spotLightCount++;
+
+    // Loading skybox texture files
+    std::vector<std::string> skyboxFaces;
+    skyboxFaces.push_back("Textures/Skybox/cupertin-lake_rt.tga");
+    skyboxFaces.push_back("Textures/Skybox/cupertin-lake_lf.tga");
+    skyboxFaces.push_back("Textures/Skybox/cupertin-lake_up.tga");
+    skyboxFaces.push_back("Textures/Skybox/cupertin-lake_dn.tga");
+    skyboxFaces.push_back("Textures/Skybox/cupertin-lake_bk.tga");
+    skyboxFaces.push_back("Textures/Skybox/cupertin-lake_ft.tga");
+
+    skybox = Skybox(skyboxFaces);
 
     shinyMaterial = Material(1.0f, 32.0f);
     dullMaterial = Material(0.3f, 4.0f);
