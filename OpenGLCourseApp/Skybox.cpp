@@ -2,7 +2,8 @@
 
 Skybox::Skybox()
 {
-
+	skyShader = nullptr;
+	textureId = uniformProjection = uniformView = 0;
 }
 
 Skybox::Skybox(std::vector<std::string> faceLocations)
@@ -37,45 +38,59 @@ Skybox::Skybox(std::vector<std::string> faceLocations)
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	// Mesh Setup Code for the vertices of a cube
-	unsigned int skyboxIndices[] = {
-		// front
-		0, 1, 2,
-		2, 1, 3,
-		// right
-		2, 3, 5,
-		5, 3, 7,
-		// back
-		5, 7, 4,
-		4, 7, 6,
-		// left
-		4, 6, 0,
-		0, 6, 1,
-		// top
-		4, 0, 5,
-		5, 0, 2,
-		// bottom
-		1, 6, 3,
-		3, 6, 7
-	};
-
-	// Since in cube maps, Texels are refered by vector not YV coordinates
-	// Hence (0, 0) for UV coordinates
-	// as well as no lighting effects, Hence no normals
 	GLfloat skyboxVertices[] = {
-		-1.0f, 1.0f, -1.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-		-1.0f, -1.0f, -1.0f,	0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-		1.0f, 1.0f, -1.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-		1.0f, -1.0f, -1.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
 
-		-1.0f, 1.0f, 1.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-		1.0f, 1.0f, 1.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-		-1.0f, -1.0f, 1.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-		1.0f, -1.0f, 1.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		1.0f,  1.0f, -1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		1.0f, -1.0f,  1.0f
 	};
-
-	skyMesh = new Mesh();
-	skyMesh->CreateMesh(skyboxVertices, skyboxIndices, 64, 36);
+	
+	// Setting up Skybox 
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glBindVertexArray(0);
 }
 
 Skybox::~Skybox()
@@ -100,7 +115,11 @@ void Skybox::DrawSkybox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 
 	skyShader->Validate();
 
-	skyMesh->RenderMesh();
+	// Drawing Skybox
+	glBindVertexArray(VAO);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
 
 	// enabling depth mask so it can be used when rendering other things in the scene
 	glDepthMask(GL_TRUE);

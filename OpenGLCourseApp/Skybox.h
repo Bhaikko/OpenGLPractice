@@ -10,7 +10,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Shader.h"
-#include "Mesh.h"
 
 #include "CommonValues.h"
 
@@ -22,12 +21,11 @@ public:
 	~Skybox();
 
 private:
-	// Since skybox has its own shader and mesh geometry
-	Mesh* skyMesh;
+	// Since skybox has its own shader 
 	Shader* skyShader;
 
 private:
-	GLuint textureId;
+	GLuint textureId, VAO, IBO, VBO;
 	GLuint uniformProjection, uniformView;
 
 public:
