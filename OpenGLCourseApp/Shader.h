@@ -125,7 +125,7 @@ public:
 
 	void SetTexture(GLuint textureUnit);
 	void SetDirectionalShadowMap(GLuint textureUnit);
-	void SetDirectionalLightTransform(glm::mat4* lTransform);
+	void SetDirectionalLightTransform(glm::mat4 lTransform);
 
 	void SetLightMatrices(std::vector<glm::mat4> lightMatrices);
 };

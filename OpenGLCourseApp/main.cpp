@@ -203,7 +203,7 @@ void DirectionalShadowMapPass(DirectionalLight* light)
     glClear(GL_DEPTH_BUFFER_BIT);
 
     uniformModel = directionalShadowShader.GetModelLocation();
-    directionalShadowShader.SetDirectionalLightTransform(&light->CalculateLightTransform());
+    directionalShadowShader.SetDirectionalLightTransform(light->CalculateLightTransform());
 
     directionalShadowShader.Validate();
 
@@ -273,7 +273,7 @@ void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
     shaderList[0].SetSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
 
     // Settng up uniform value for shadowMap for directional light
-    shaderList[0].SetDirectionalLightTransform(&mainLight.CalculateLightTransform());
+    shaderList[0].SetDirectionalLightTransform(mainLight.CalculateLightTransform());
 
     mainLight.GetShadowMap()->Read(GL_TEXTURE2);
     shaderList[0].SetTexture(1);

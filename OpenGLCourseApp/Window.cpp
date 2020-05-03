@@ -130,8 +130,6 @@ void Window::handleMouse(GLFWwindow* window, double xPos, double yPos)
 
     theWindow->lastX = xPos;
     theWindow->lastY = yPos;
-
-    /*std::cout << theWindow->xChange << " " << theWindow->yChange << std::endl;*/
 }
 
 GLfloat Window::getXChange()
